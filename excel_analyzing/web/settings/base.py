@@ -76,8 +76,8 @@ DATABASES = {
         "HOST": app_settings.database_host,
         "PORT": app_settings.database_port,
         "OPTIONS": {
-            "MAX_CONNS": app_settings.database_pool_size,
         },
+        "CONN_MAX_AGE": app_settings.database_pool_size,
     }
 }
 
