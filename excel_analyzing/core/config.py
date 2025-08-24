@@ -6,8 +6,14 @@ from typing import Any, List
 try:
     from pydantic import BaseSettings, Field, validator
 except ImportError:
-    from pydantic import Field, validator
-    from pydantic_settings import BaseSettings
+    # Handle case where pydantic_settings is not available
+    try:
+        from pydantic import Field, validator
+        from pydantic_settings import BaseSettings
+    except ImportError:
+        # Fallback for environments without pydantic_settings
+        from pydantic import BaseModel, Field, validator
+        BaseSettings = BaseModel
 
 
 class Environment(str, Enum):

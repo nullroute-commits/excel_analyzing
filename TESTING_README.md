@@ -37,7 +37,9 @@ tests/
 
 ## 🚀 Quick Start
 
-### Run All Tests
+### Standard Environment
+When all dependencies are available:
+
 ```bash
 # Using the test runner script
 python run_tests.py --all
@@ -48,6 +50,22 @@ tox -e all-tests
 # Using pytest
 pytest tests/ -v
 ```
+
+### Limited Environment (Network/Dependency Issues)
+When testing dependencies are not available, fallback tools are provided:
+
+```bash
+# Basic validation without pytest
+python simple_test_runner.py
+
+# Style checking without external tools
+python simple_linter.py
+
+# Automatic fallback testing (recommended)
+python run_tests.py --lint
+```
+
+The test runner automatically detects available tools and uses appropriate fallbacks.
 
 ### Run Specific Test Categories
 ```bash

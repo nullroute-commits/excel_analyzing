@@ -13,6 +13,34 @@ The testing infrastructure is designed to ensure code quality, security, and per
 - **Performance Tests**: Monitor and maintain performance characteristics
 - **End-to-End Tests**: Test complete user workflows
 
+## Environment Considerations
+
+### Standard Environment
+When all testing dependencies are available (pytest, black, flake8, mypy, etc.), the full testing suite can be executed with complete functionality.
+
+### Limited Environment (Network/Dependency Issues)
+When testing dependencies are not available, the infrastructure automatically falls back to simplified tools:
+
+- **Simple Test Runner** (`simple_test_runner.py`): Provides basic validation without pytest
+  - Import testing for all modules
+  - Syntax checking for Python files
+  - Basic model validation
+  - Test file structure validation
+
+- **Simple Linter** (`simple_linter.py`): Provides basic code quality checks without external tools
+  - Line length validation
+  - Import organization checks
+  - Basic naming convention checks
+  - Whitespace and indentation validation
+
+### Automatic Fallback
+The main test runner (`run_tests.py`) automatically detects available tools and uses appropriate fallbacks:
+
+```bash
+# This will automatically use fallback tools if pytest/black/flake8 are not available
+python run_tests.py --lint
+```
+
 ## Test Structure
 
 ```
@@ -285,6 +313,26 @@ security_data = TestDataGenerator.create_security_test_data()
 
 ### Common Issues
 
+#### Network/Dependency Installation Issues
+If you cannot install testing dependencies (pytest, black, flake8, etc.) due to network issues:
+
+```bash
+# Use the simple test runner for basic validation
+python simple_test_runner.py
+
+# Use the fallback linting system
+python run_tests.py --lint
+
+# The test runner will automatically detect missing tools and use fallbacks
+```
+
+#### Missing Testing Tools
+When standard tools are not available, the infrastructure provides alternatives:
+
+- **No pytest**: Use `python simple_test_runner.py` for basic validation
+- **No black/flake8**: Use `python simple_linter.py` for basic style checks
+- **No mypy**: Type checking is skipped but imports are still validated
+
 #### Test Database Issues
 ```bash
 # Reset test database
@@ -307,6 +355,23 @@ python manage.py migrate --settings=excel_analyzing.web.settings.test
 - Increase wait timeouts for slow operations
 - Use proper page state waiting
 - Check for race conditions
+
+#### Limited Environment Validation
+In environments with limited tool availability:
+
+1. **Core Validation**: Run `python simple_test_runner.py` to verify:
+   - All modules import correctly
+   - No syntax errors in Python files
+   - Basic model functionality works
+   - Test file structure is intact
+
+2. **Style Validation**: Run `python simple_linter.py` to check:
+   - Line length issues
+   - Import organization
+   - Basic naming conventions
+   - Whitespace problems
+
+3. **Integration Check**: Run `python run_tests.py --lint` for automatic fallback testing
 
 ### Getting Help
 - Check CI/CD logs for detailed error information
