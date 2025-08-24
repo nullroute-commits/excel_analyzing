@@ -3,12 +3,12 @@
 import logging
 import logging.config
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from ..core.config import settings
 
 
-def setup_logging(config: Dict[str, Any] = None) -> None:
+def setup_logging(config: Optional[Dict[str, Any]] = None) -> None:
     """Set up logging configuration."""
     if config is None:
         config = {

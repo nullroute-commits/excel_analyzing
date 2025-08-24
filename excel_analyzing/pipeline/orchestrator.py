@@ -3,6 +3,7 @@
 import json
 import logging
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, Generator, List, Optional
 
@@ -103,6 +104,7 @@ class ExcelPipeline:
             result = ProcessingResult(
                 workbook=workbook_info,
                 success=True,
+                error_message=None,
                 rows_processed=total_rows,
                 columns_processed=total_columns,
                 processing_time_seconds=processing_time,
@@ -126,6 +128,7 @@ class ExcelPipeline:
                 file_name=file_path.name,
                 file_size_bytes=file_path.stat().st_size if file_path.exists() else 0,
                 sheet_count=0,
+                processed_at=datetime.utcnow(),
             )
 
             result = ProcessingResult(
@@ -180,9 +183,9 @@ class ExcelPipeline:
             if existing_workbook:
                 # Update existing workbook
                 workbook_model = existing_workbook
-                workbook_model.file_name = workbook_info.file_name
+                workbook_model.file_name = workbook_info.file_name  # type: ignore
                 workbook_model.file_size_bytes = workbook_info.file_size_bytes
-                workbook_model.sheet_count = workbook_info.sheet_count
+                workbook_model.sheet_count = workbook_info.sheet_count  # type: ignore
                 workbook_model.processed_at = workbook_info.processed_at
 
                 # Delete existing sheets (cascade will handle columns)

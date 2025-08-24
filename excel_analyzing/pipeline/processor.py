@@ -2,6 +2,7 @@
 
 import logging
 import re
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
@@ -61,6 +62,7 @@ class ExcelDataProcessor:
             file_name=file_name,
             file_size_bytes=file_size,
             sheet_count=len(sheet_names),
+            processed_at=datetime.utcnow(),
         )
 
         # Process each sheet

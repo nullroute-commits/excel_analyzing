@@ -23,9 +23,9 @@ CSRF_COOKIE_SECURE = True
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Logging
-LOGGING["handlers"]["file"][
+LOGGING["handlers"]["file"][  # type: ignore  # noqa: F405
     "filename"
-] = "/var/log/excel_analyzing/django.log"  # noqa: F405
+] = "/var/log/excel_analyzing/django.log"
 
 # Email backend
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
