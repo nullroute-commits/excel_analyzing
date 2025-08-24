@@ -1,20 +1,74 @@
 # Developer Guide
 
+# Developer Guide
+
 ## Architecture Overview
 
-Excel Analyzing follows a layered architecture with clear separation of concerns:
+Excel Analyzing follows a containerized microservices architecture with clear separation of concerns and hostname-based service communication:
 
 ```
-┌─────────────────┐
-│   Web Interface │  ← Django web app & REST API
-├─────────────────┤
-│   Business Logic│  ← Pipeline orchestration & processing
-├─────────────────┤
-│   Data Models   │  ← Pydantic schemas & SQLAlchemy models
-├─────────────────┤
-│   Core Services │  ← Configuration, logging, utilities
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Web Service   │◄──►│  Database Svc   │◄──►│   Cache Service │
+│  (web-service)  │    │  (db-service)   │    │ (cache-service) │
+├─────────────────┤    ├─────────────────┤    ├─────────────────┤
+│ Django REST API │    │ PostgreSQL      │    │ Redis Cache     │
+│ Web Interface   │    │ Alpine Based    │    │ Alpine Based    │
+│ Alpine Based    │    └─────────────────┘    └─────────────────┘
 └─────────────────┘
+        │
+        ▼
+┌─────────────────┐    ┌─────────────────┐
+│ Worker Service  │    │ Processing Core │
+│(worker-service) │◄──►│   (Internal)    │
+├─────────────────┤    ├─────────────────┤
+│ Background Jobs │    │ Excel Analysis  │
+│ Alpine Based    │    │ Core Logic      │
+└─────────────────┘    └─────────────────┘
 ```
+
+### Service Architecture
+
+#### Hostname-Based Communication
+All services communicate using hostnames instead of localhost/IP addresses:
+- **Development**: `dev-web-service`, `dev-db-service`, `dev-cache-service`
+- **Test**: `test-web-service`, `test-db-service`, `test-cache-service`  
+- **Production**: `prod-web-service`, `prod-db-service`, `prod-cache-service`
+
+#### Container Strategy
+- **Alpine Base Images**: All containers use Alpine Linux for minimal size
+- **Multistage Builds**: Production containers use multistage builds for better caching
+- **Environment Separation**: Dedicated Dockerfiles for dev, test, and production
+
+### Configuration Management
+
+#### Centralized Environment Structure
+Configuration is organized in `/env/service/subservice/` pattern:
+
+```
+env/
+├── web/django/           # Web service Django settings
+│   ├── .env.development
+│   ├── .env.test
+│   └── .env.production
+├── database/postgresql/  # Database service settings
+│   ├── .env.development
+│   ├── .env.test
+│   └── .env.production
+├── cache/redis/         # Cache service settings
+│   ├── .env.development
+│   ├── .env.test
+│   └── .env.production
+└── processing/core/     # Processing service settings
+    ├── .env.development
+    ├── .env.test
+    └── .env.production
+```
+
+#### Dynamic Configuration Loading
+The application automatically loads environment-specific configurations based on the `ENVIRONMENT` variable:
+- `ENVIRONMENT=development` → loads `.env.development` files
+- `ENVIRONMENT=test` → loads `.env.test` files
+- `ENVIRONMENT=production` → loads `.env.production` files
 
 ### Components
 
@@ -43,48 +97,63 @@ Excel Analyzing follows a layered architecture with clear separation of concerns
 
 ### Prerequisites
 - Python 3.9+
-- PostgreSQL 12+
+- Docker & Docker Compose
 - Git
-- Docker (optional)
 
-### Local Development
+### Environment Configuration
 
-1. **Clone and setup:**
-   ```bash
-   git clone https://github.com/nullroute-commits/excel_analyzing.git
-   cd excel_analyzing
-   python -m venv venv
-   source venv/bin/activate
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   pip install -r requirements-dev.txt
-   pip install -e .
-   ```
-
-3. **Configure environment:**
-   ```bash
-   cp .env.example .env
-   # Edit .env for your local setup
-   ```
-
-4. **Setup database:**
-   ```bash
-   createdb excel_analyzing_dev
-   excel-analyze init-db
-   ```
-
-5. **Run tests:**
-   ```bash
-   pytest
-   ```
-
-### Docker Development
-
+#### Quick Start with Docker (Recommended)
 ```bash
-docker-compose -f docker-compose.dev.yml up
+# Clone and setup
+git clone https://github.com/nullroute-commits/excel_analyzing.git
+cd excel_analyzing
+
+# Start development environment
+docker-compose -f docker-compose.dev.yml up -d
+
+# View logs
+docker-compose -f docker-compose.dev.yml logs -f
 ```
+
+#### Local Development (Alternative)
+```bash
+# Clone and setup
+git clone https://github.com/nullroute-commits/excel_analyzing.git
+cd excel_analyzing
+python -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements-dev.txt
+pip install -e .
+
+# Set environment
+export ENVIRONMENT=development
+
+# Setup database (requires PostgreSQL running)
+createdb excel_analyzing_dev
+excel-analyze init-db
+
+# Run development server
+python manage.py runserver 0.0.0.0:8000
+```
+
+### Environment-Specific Setup
+
+#### Development Environment
+- **Services**: `dev-web-service`, `dev-db-service`, `dev-cache-service`
+- **Configuration**: Loaded from `env/*/development` files
+- **Features**: Debug enabled, local volume mounts, hot reloading
+
+#### Test Environment  
+- **Services**: `test-web-service`, `test-db-service`, `test-cache-service`
+- **Configuration**: Loaded from `env/*/test` files
+- **Features**: Optimized for testing, isolated test database
+
+#### Production Environment
+- **Services**: `prod-web-service`, `prod-db-service`, `prod-cache-service`
+- **Configuration**: Loaded from `env/*/production` files
+- **Features**: Security hardened, optimized performance, SSL enabled
 
 ## Code Standards
 
@@ -467,32 +536,80 @@ def sample_workbook(tmp_path):
 
 ### Environment Setup
 
+All environments use hostname-based service discovery and centralized configuration management.
+
 #### Development
 ```bash
-export ENVIRONMENT=development
-export DEBUG=True
-export DATABASE_URL=postgresql://localhost/excel_analyzing_dev
+# Start development environment
+docker-compose -f docker-compose.dev.yml up -d
+
+# Environment automatically loads from:
+# - env/web/django/.env.development
+# - env/database/postgresql/.env.development  
+# - env/cache/redis/.env.development
+# - env/processing/core/.env.development
+```
+
+#### Test  
+```bash
+# Start test environment
+docker-compose -f docker-compose.test.yml up -d
+
+# Run tests
+docker-compose -f docker-compose.test.yml exec web-service python -m pytest
 ```
 
 #### Production
 ```bash
-export ENVIRONMENT=production
-export DEBUG=False
-export DATABASE_URL=postgresql://user:pass@host:port/excel_analyzing
-export DJANGO_SECRET_KEY=secure-random-key
+# Set production secrets
+export DATABASE_PASSWORD=your-secure-password
+export DJANGO_SECRET_KEY=your-secure-secret-key
+export REDIS_PASSWORD=your-redis-password
+
+# Start production environment
+docker-compose up -d
+
+# Environment automatically loads from:
+# - env/web/django/.env.production
+# - env/database/postgresql/.env.production
+# - env/cache/redis/.env.production
+# - env/processing/core/.env.production
 ```
 
 ### Docker Deployment
 
-#### Build Image
+#### Build Images
+
+**Development Image (Alpine-based)**
+```bash
+docker build -f Dockerfile.dev -t excel-analyzing:dev .
+```
+
+**Test Image (Alpine-based)**
+```bash
+docker build -f Dockerfile.test -t excel-analyzing:test .
+```
+
+**Production Image (Alpine-based, Multistage)**
 ```bash
 docker build -t excel-analyzing:latest .
 ```
 
-#### Run with Docker Compose
-```bash
-docker-compose up -d
-```
+#### Container Architecture
+- **Base Images**: All containers use Alpine Linux for minimal size
+- **Multistage Builds**: Production builds use multistage pattern for better caching
+- **Security**: Non-root users, minimal attack surface
+- **Networking**: Isolated Docker networks per environment
+
+### Service Discovery
+
+Each environment uses hostname-based service discovery:
+
+| Environment | Web Service | Database Service | Cache Service |
+|------------|-------------|------------------|---------------|
+| Development | `dev-web-service:8000` | `dev-db-service:5432` | `dev-cache-service:6379` |
+| Test | `test-web-service:8000` | `test-db-service:5432` | `test-cache-service:6379` |
+| Production | `prod-web-service:8000` | `prod-db-service:5432` | `prod-cache-service:6379` |
 
 ### Monitoring
 

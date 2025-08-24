@@ -70,28 +70,16 @@ WSGI_APPLICATION = "excel_analyzing.web.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": app_settings.database_url.split("/")[-1],
-        "USER": "postgres",
-        "PASSWORD": "",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "NAME": app_settings.database_name,
+        "USER": app_settings.database_user,
+        "PASSWORD": app_settings.database_password,
+        "HOST": app_settings.database_host,
+        "PORT": app_settings.database_port,
+        "OPTIONS": {
+        },
+        "CONN_MAX_AGE": app_settings.database_pool_size,
     }
 }
-
-# Parse DATABASE_URL if provided
-if "://" in app_settings.database_url:
-    import urllib.parse as urlparse
-
-    url = urlparse.urlparse(app_settings.database_url)
-    DATABASES["default"].update(
-        {
-            "NAME": url.path[1:],
-            "USER": url.username or "postgres",
-            "PASSWORD": url.password or "",
-            "HOST": url.hostname or "localhost",
-            "PORT": str(url.port or 5432),
-        }
-    )
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -172,4 +160,18 @@ EXCEL_ANALYZING = {
     "MAX_FILE_SIZE_MB": app_settings.max_file_size_mb,
     "CHUNK_SIZE": app_settings.chunk_size,
     "MAX_SHEETS_PER_WORKBOOK": app_settings.max_sheets_per_workbook,
+    "PROCESSING_TIMEOUT": app_settings.processing_timeout,
+    "MAX_CONCURRENT_JOBS": app_settings.max_concurrent_jobs,
 }
+
+# Cache configuration (Redis)
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": app_settings.redis_url,
+    }
+}
+
+# API Base URL for internal service communication
+API_BASE_URL = app_settings.api_base_url
+FRONTEND_URL = app_settings.frontend_url

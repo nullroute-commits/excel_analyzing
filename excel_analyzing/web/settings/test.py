@@ -1,15 +1,23 @@
 """Test settings."""
 
 from .base import *  # noqa: F403, F401
+from ...core.config import settings as app_settings
 
 # Test specific settings
 DEBUG = False
 
-# Use in-memory database for tests
+# Use test database with hostname-based configuration
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": ":memory:",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": app_settings.database_name,
+        "USER": app_settings.database_user,
+        "PASSWORD": app_settings.database_password,
+        "HOST": app_settings.database_host,
+        "PORT": app_settings.database_port,
+        "TEST": {
+            "NAME": "test_excel_analyzing",
+        },
     }
 }
 
@@ -30,10 +38,11 @@ class DisableMigrations:
 
 MIGRATION_MODULES = DisableMigrations()
 
-# Cache
+# Cache using hostname-based configuration
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": app_settings.redis_url,
     }
 }
 
