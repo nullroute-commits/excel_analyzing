@@ -31,7 +31,6 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "excel_analyzing.web.apps.workbooks",
-    "excel_analyzing.web.apps.api",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -90,7 +89,7 @@ if "://" in app_settings.database_url:
             "USER": url.username or "postgres",
             "PASSWORD": url.password or "",
             "HOST": url.hostname or "localhost",
-            "PORT": url.port or 5432,
+            "PORT": str(url.port or 5432),
         }
     )
 

@@ -2,8 +2,17 @@
 
 from typing import Optional
 
-from sqlalchemy import (Boolean, Column, DateTime, Float, ForeignKey, Integer,
-                        String, Text, create_engine)
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    create_engine,
+)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.sql import func
@@ -13,7 +22,7 @@ from ..core.config import settings
 Base = declarative_base()
 
 
-class WorkbookModel(Base):
+class WorkbookModel(Base):  # type: ignore
     """Database model for Excel workbooks."""
 
     __tablename__ = "workbooks"
@@ -39,7 +48,7 @@ class WorkbookModel(Base):
         return f"<WorkbookModel(id={self.id}, file_name='{self.file_name}')>"
 
 
-class SheetModel(Base):
+class SheetModel(Base):  # type: ignore
     """Database model for Excel sheets."""
 
     __tablename__ = "sheets"
@@ -71,7 +80,7 @@ class SheetModel(Base):
         )
 
 
-class ColumnModel(Base):
+class ColumnModel(Base):  # type: ignore
     """Database model for Excel columns."""
 
     __tablename__ = "columns"
@@ -100,7 +109,7 @@ class ColumnModel(Base):
         )
 
 
-class ProcessingResultModel(Base):
+class ProcessingResultModel(Base):  # type: ignore
     """Database model for processing results."""
 
     __tablename__ = "processing_results"

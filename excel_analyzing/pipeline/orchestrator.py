@@ -10,8 +10,13 @@ from typing import Dict, Generator, List, Optional
 from sqlalchemy.orm import Session
 
 from ..core.config import settings
-from ..models.database import (ColumnModel, ProcessingResultModel, SheetModel,
-                               WorkbookModel, db_manager)
+from ..models.database import (
+    ColumnModel,
+    ProcessingResultModel,
+    SheetModel,
+    WorkbookModel,
+    db_manager,
+)
 from ..models.schemas import ProcessingOptions, ProcessingResult, WorkbookInfo
 from .processor import ExcelDataProcessor
 
@@ -184,9 +189,11 @@ class ExcelPipeline:
                 # Update existing workbook
                 workbook_model = existing_workbook
                 workbook_model.file_name = workbook_info.file_name  # type: ignore
-                workbook_model.file_size_bytes = workbook_info.file_size_bytes
+                workbook_model.file_size_bytes = (
+                    workbook_info.file_size_bytes  # type: ignore
+                )
                 workbook_model.sheet_count = workbook_info.sheet_count  # type: ignore
-                workbook_model.processed_at = workbook_info.processed_at
+                workbook_model.processed_at = workbook_info.processed_at  # type: ignore
 
                 # Delete existing sheets (cascade will handle columns)
                 session.query(SheetModel).filter_by(

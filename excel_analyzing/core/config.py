@@ -18,7 +18,7 @@ class Environment(str, Enum):
     PRODUCTION = "production"
 
 
-class Settings(BaseSettings):
+class Settings(BaseSettings):  # type: ignore
     """Application settings with environment-specific configurations."""
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
