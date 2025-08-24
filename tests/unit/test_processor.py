@@ -80,9 +80,11 @@ class TestExcelDataProcessor:
         """Test data type inference for booleans."""
         processor = ExcelDataProcessor()
         
-        bool_series = pd.Series([True, False, True])
+        # Test with actual boolean values
+        bool_series = pd.Series([True, False, True], dtype='bool')
         assert processor._infer_data_type(bool_series) == DataType.BOOLEAN
         
+        # Test with string boolean values  
         bool_string_series = pd.Series(["True", "False", "true"])
         assert processor._infer_data_type(bool_string_series) == DataType.BOOLEAN
     

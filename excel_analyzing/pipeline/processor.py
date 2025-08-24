@@ -241,7 +241,11 @@ class ExcelDataProcessor:
         if series.empty:
             return DataType.STRING
         
-        # Try to infer numeric types first
+        # Check for boolean first (before numeric)
+        if series.dtype == 'bool' or series.isin([True, False, 'True', 'False', 'true', 'false']).all():
+            return DataType.BOOLEAN
+        
+        # Try to infer numeric types
         try:
             # Check if all values can be converted to integers
             pd.to_numeric(series, errors='raise')
@@ -251,10 +255,6 @@ class ExcelDataProcessor:
                 return DataType.FLOAT
         except (ValueError, TypeError):
             pass
-        
-        # Check for boolean
-        if series.dtype == 'bool' or series.isin([True, False, 'True', 'False', 'true', 'false', 1, 0]).all():
-            return DataType.BOOLEAN
         
         # Check for datetime
         try:
