@@ -2,7 +2,7 @@
 
 from django.views.generic import DetailView, ListView, TemplateView
 
-from ...models.database import WorkbookModel
+from excel_analyzing.models.database import WorkbookModel
 
 
 class IndexView(TemplateView):

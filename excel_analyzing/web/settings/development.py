@@ -20,10 +20,14 @@ DATABASES = {
     }
 }
 
-# Development tools
-INSTALLED_APPS += [  # noqa: F405
-    "django_extensions",
-]
+# Development tools (optional)
+try:
+    import django_extensions
+    INSTALLED_APPS += [  # noqa: F405
+        "django_extensions",
+    ]
+except ImportError:
+    pass  # django_extensions not available
 
 # Disable CSRF for API development
 CSRF_TRUSTED_ORIGINS = [
