@@ -120,16 +120,47 @@ pre-commit run --all-files
 #### Testing
 ```bash
 # Run all tests
-pytest
+python run_tests.py --all
+
+# Run specific test categories
+python run_tests.py --unit --lint
+python run_tests.py --integration --security
+python run_tests.py --performance --regression
+
+# Run with additional options
+python run_tests.py --unit --coverage
+python run_tests.py --e2e --headed --video
+
+# Using pytest directly
+pytest tests/unit/ -v
+pytest tests/integration/ -v --tb=short
+pytest tests/security/ -v
+pytest tests/performance/ -v --benchmark-json=benchmark.json
+pytest tests/regression/ -v
+pytest tests/e2e/ -v
+
+# Using tox for multiple environments
+tox -e py311,integration,security
+tox -e performance
+tox -e e2e
 
 # With coverage
 pytest --cov=excel_analyzing --cov-report=html
 
 # Specific test files
 pytest tests/unit/test_models.py
+pytest tests/integration/test_pipeline_integration.py
 
 # Integration tests
 pytest tests/integration/
+
+# Security tests
+pytest tests/security/
+bandit -r excel_analyzing/
+safety check
+
+# Performance benchmarking
+pytest tests/performance/ --benchmark-json=benchmark.json
 ```
 
 ## Adding New Features
@@ -369,16 +400,37 @@ def memory_intensive_function():
 - Test individual functions/methods
 - Mock external dependencies
 - Fast execution (< 1s per test)
+- Location: `tests/unit/`
 
 #### Integration Tests
 - Test component interactions
 - Use test database
 - Moderate execution time
+- Location: `tests/integration/`
+
+#### Regression Tests
+- Ensure changes don't break existing functionality
+- Compare against baselines
+- Detect performance regressions
+- Location: `tests/regression/`
+
+#### Security Tests
+- Input sanitization and validation
+- Authentication/authorization testing
+- Vulnerability scanning
+- Location: `tests/security/`
+
+#### Performance Tests
+- Monitor execution time and memory usage
+- Benchmark critical operations
+- Scalability testing
+- Location: `tests/performance/`
 
 #### End-to-End Tests
 - Test complete workflows
-- Use real files (small samples)
-- Slower execution acceptable
+- Browser automation with Playwright
+- User journey validation
+- Location: `tests/e2e/`
 
 ### Test Data
 
