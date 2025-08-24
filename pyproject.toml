@@ -113,7 +113,20 @@ warn_unused_configs = true
 DJANGO_SETTINGS_MODULE = "excel_analyzing.web.settings.test"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
 testpaths = ["tests"]
-addopts = "--cov=excel_analyzing --cov-report=term-missing --cov-report=html"
+addopts = "--cov=excel_analyzing --cov-report=term-missing --cov-report=html --tb=short"
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests", 
+    "regression: Regression tests",
+    "security: Security tests",
+    "performance: Performance tests",
+    "e2e: End-to-end tests",
+    "slow: Slow running tests"
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
+]
 
 [tool.coverage.run]
 source = ["excel_analyzing"]
