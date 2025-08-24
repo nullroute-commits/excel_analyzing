@@ -1,6 +1,8 @@
 """Core configuration and settings management."""
 
+import os
 from enum import Enum
+from pathlib import Path
 from typing import Any, List
 
 try:
@@ -30,12 +32,20 @@ class Settings(BaseSettings):  # type: ignore
         default=Environment.DEVELOPMENT, description="Application environment"
     )
 
-    # Database settings
-    database_url: str = Field(
-        default="postgresql://localhost/excel_analyzing", description="Database URL"
-    )
+    # Database settings (hostname-based)
+    database_host: str = Field(default="db-service", description="Database hostname")
+    database_port: int = Field(default=5432, description="Database port")
+    database_name: str = Field(default="excel_analyzing", description="Database name")
+    database_user: str = Field(default="postgres", description="Database user")
+    database_password: str = Field(default="password", description="Database password")
     database_pool_size: int = Field(default=10, description="Database pool size")
     database_max_overflow: int = Field(default=20, description="Database max overflow")
+
+    # Cache settings (hostname-based)
+    redis_host: str = Field(default="cache-service", description="Redis hostname")
+    redis_port: int = Field(default=6379, description="Redis port")
+    redis_db: int = Field(default=0, description="Redis database")
+    redis_password: str = Field(default="", description="Redis password")
 
     # Excel processing settings
     max_file_size_mb: int = Field(default=100, description="Max file size in MB")
@@ -43,14 +53,20 @@ class Settings(BaseSettings):  # type: ignore
     max_sheets_per_workbook: int = Field(
         default=50, description="Max sheets per workbook"
     )
+    processing_timeout: int = Field(default=300, description="Processing timeout in seconds")
+    max_concurrent_jobs: int = Field(default=4, description="Max concurrent processing jobs")
 
     # Django settings
     django_secret_key: str = Field(
         default="dev-secret-key-change-in-production", description="Django secret key"
     )
     allowed_hosts: List[str] = Field(
-        default=["localhost", "127.0.0.1"], description="Allowed hosts"
+        default=["web-service", "localhost", "127.0.0.1"], description="Allowed hosts"
     )
+
+    # URL settings (hostname-based)
+    api_base_url: str = Field(default="http://web-service:8000/api", description="API base URL")
+    frontend_url: str = Field(default="http://web-service:8000", description="Frontend URL")
 
     # Logging settings
     log_level: str = Field(default="INFO", description="Log level")
@@ -58,6 +74,18 @@ class Settings(BaseSettings):  # type: ignore
         default="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         description="Log format",
     )
+
+    @property
+    def database_url(self) -> str:
+        """Construct database URL from hostname-based components."""
+        return f"postgresql://{self.database_user}:{self.database_password}@{self.database_host}:{self.database_port}/{self.database_name}"
+
+    @property
+    def redis_url(self) -> str:
+        """Construct Redis URL from hostname-based components."""
+        if self.redis_password:
+            return f"redis://:{self.redis_password}@{self.redis_host}:{self.redis_port}/{self.redis_db}"
+        return f"redis://{self.redis_host}:{self.redis_port}/{self.redis_db}"
 
     @validator("allowed_hosts", pre=True)
     def parse_allowed_hosts(cls, v: Any) -> List[str]:
@@ -75,9 +103,36 @@ class Settings(BaseSettings):  # type: ignore
 
 
 def get_settings() -> Settings:
-    """Get application settings instance."""
+    """Get application settings instance with environment-specific configuration."""
+    # Get current environment
+    env = os.getenv("ENVIRONMENT", "development")
+    
+    # Define base path for environment configurations
+    base_path = Path(__file__).parent.parent.parent / "env"
+    
+    # Load configuration files based on service and environment
+    env_files = [
+        base_path / "web" / "django" / f".env.{env}",
+        base_path / "database" / "postgresql" / f".env.{env}",
+        base_path / "cache" / "redis" / f".env.{env}",
+        base_path / "processing" / "core" / f".env.{env}",
+    ]
+    
+    # Add root .env file if it exists
+    root_env = base_path.parent / ".env"
+    if root_env.exists():
+        env_files.append(root_env)
+    
+    # Filter existing files and convert to strings
+    existing_env_files = [str(f) for f in env_files if f.exists()]
+    
+    # Load environment variables from files
+    for env_file in existing_env_files:
+        from dotenv import load_dotenv
+        load_dotenv(env_file, override=True)
+    
     return Settings()
 
 
-# Global settings instance
+# Global settings instance - will be initialized once at import time
 settings = get_settings()

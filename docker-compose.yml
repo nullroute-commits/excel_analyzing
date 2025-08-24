@@ -1,40 +1,58 @@
 version: '3.8'
 
 services:
-  web:
-    build: .
+  web-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: prod-web-service
+    hostname: prod-web-service
     ports:
       - "8000:8000"
+    env_file:
+      - ./env/web/django/.env.production
+      - ./env/processing/core/.env.production
     environment:
       - ENVIRONMENT=production
-      - DATABASE_URL=postgresql://postgres:password@db:5432/excel_analyzing
-      - DJANGO_SECRET_KEY=your-secret-key-here
-      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - DATABASE_HOST=prod-db-service
+      - REDIS_HOST=prod-cache-service
     depends_on:
-      - db
-      - redis
+      - db-service
+      - cache-service
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
       - logs_volume:/app/logs
     restart: unless-stopped
+    networks:
+      - excel-network
 
-  db:
-    image: postgres:13
-    environment:
-      - POSTGRES_DB=excel_analyzing
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
+  db-service:
+    image: postgres:13-alpine
+    container_name: prod-db-service
+    hostname: prod-db-service
+    env_file:
+      - ./env/database/postgresql/.env.production
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    networks:
+      - excel-network
 
-  redis:
-    image: redis:6-alpine
+  cache-service:
+    image: redis:7-alpine
+    container_name: prod-cache-service
+    hostname: prod-cache-service
+    env_file:
+      - ./env/cache/redis/.env.production
     restart: unless-stopped
+    networks:
+      - excel-network
 
-  nginx:
+  nginx-service:
     image: nginx:alpine
+    container_name: prod-nginx-service
+    hostname: prod-nginx-service
     ports:
       - "80:80"
       - "443:443"
@@ -44,22 +62,38 @@ services:
       - media_volume:/app/media:ro
       - ./ssl:/etc/nginx/ssl:ro
     depends_on:
-      - web
+      - web-service
     restart: unless-stopped
+    networks:
+      - excel-network
 
-  worker:
-    build: .
+  worker-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: prod-worker-service
+    hostname: prod-worker-service
     command: python -m excel_analyzing.cli process /app/data --recursive
+    env_file:
+      - ./env/web/django/.env.production
+      - ./env/processing/core/.env.production
     environment:
       - ENVIRONMENT=production
-      - DATABASE_URL=postgresql://postgres:password@db:5432/excel_analyzing
+      - DATABASE_HOST=prod-db-service
+      - REDIS_HOST=prod-cache-service
     depends_on:
-      - db
-      - redis
+      - db-service
+      - cache-service
     volumes:
       - data_volume:/app/data
       - logs_volume:/app/logs
     restart: unless-stopped
+    networks:
+      - excel-network
+
+networks:
+  excel-network:
+    driver: bridge
 
 volumes:
   postgres_data:

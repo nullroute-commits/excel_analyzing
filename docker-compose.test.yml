@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  web-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: test-web-service
+    hostname: test-web-service
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./env/web/django/.env.test
+      - ./env/processing/core/.env.test
+    environment:
+      - ENVIRONMENT=test
+      - DATABASE_HOST=test-db-service
+      - REDIS_HOST=test-cache-service
+    depends_on:
+      - db-service
+      - cache-service
+    volumes:
+      - .:/app
+      - ./test_data:/app/test_data
+    command: python -m pytest -v
+    networks:
+      - excel-test-network
+
+  db-service:
+    image: postgres:13-alpine
+    container_name: test-db-service
+    hostname: test-db-service
+    env_file:
+      - ./env/database/postgresql/.env.test
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    networks:
+      - excel-test-network
+
+  cache-service:
+    image: redis:7-alpine
+    container_name: test-cache-service
+    hostname: test-cache-service
+    env_file:
+      - ./env/cache/redis/.env.test
+    networks:
+      - excel-test-network
+
+networks:
+  excel-test-network:
+    driver: bridge
+
+volumes:
+  postgres_test_data:

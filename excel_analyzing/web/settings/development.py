@@ -1,22 +1,20 @@
 """Development settings."""
 
 from .base import *  # noqa: F403, F401
+from ...core.config import settings as app_settings
 
 # Development specific settings
 DEBUG = True
 
-# Allow all hosts in development
-ALLOWED_HOSTS = ["*"]
-
-# Database - use local PostgreSQL
+# Database - use hostname-based configuration
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "excel_analyzing_dev",
-        "USER": "postgres",
-        "PASSWORD": "",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "NAME": app_settings.database_name,
+        "USER": app_settings.database_user,
+        "PASSWORD": app_settings.database_password,
+        "HOST": app_settings.database_host,
+        "PORT": app_settings.database_port,
     }
 }
 
@@ -25,18 +23,19 @@ INSTALLED_APPS += [  # noqa: F405
     "django_extensions",
 ]
 
-# Disable CSRF for API development
+# CSRF trusted origins using hostname-based URLs
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
+    app_settings.frontend_url,
+    "http://dev-web-service:8000",
 ]
 
 # Email backend for development
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-# Cache
+# Cache using hostname-based configuration
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": app_settings.redis_url,
     }
 }
