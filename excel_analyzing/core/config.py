@@ -127,10 +127,17 @@ def get_settings() -> Settings:
     existing_env_files = [str(f) for f in env_files if f.exists()]
     
     # Load environment variables from files
+    # Environment files are loaded in the following order:
+    #   1. web/django/.env.{env}
+    #   2. database/postgresql/.env.{env}
+    #   3. cache/redis/.env.{env}
+    #   4. processing/core/.env.{env}
+    #   5. root .env (if exists)
+    # Because override=True is used, variables from later files will override those from earlier files.
+    # This makes the last file in the list highest precedence.
     for env_file in existing_env_files:
         from dotenv import load_dotenv
         load_dotenv(env_file, override=True)
-    
     return Settings()
 
 
