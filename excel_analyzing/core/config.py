@@ -134,5 +134,5 @@ def get_settings() -> Settings:
     return Settings()
 
 
-# Global settings instance
+# Global settings instance - will be initialized once at import time
 settings = get_settings()
