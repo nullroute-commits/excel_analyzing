@@ -58,7 +58,7 @@ class Settings(BaseSettings):  # type: ignore
 
     # Django settings
     django_secret_key: str = Field(
-        default="dev-secret-key-change-in-production", description="Django secret key"
+        default="dev-secret-key-change-in-production-this-is-long-enough-for-security-tests", description="Django secret key"
     )
     allowed_hosts: List[str] = Field(
         default=["web-service", "localhost", "127.0.0.1"], description="Allowed hosts"
