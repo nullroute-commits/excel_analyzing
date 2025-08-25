@@ -1,23 +1,24 @@
 """Data type inference utilities."""
 
+from typing import Dict
+
 import pandas as pd
-from typing import Dict, Any
 
 
 def infer_data_types(data: pd.DataFrame) -> Dict[str, str]:
     """Infer data types for DataFrame columns.
-    
+
     Args:
         data: Input DataFrame
-        
+
     Returns:
         Dictionary mapping column names to inferred data types
     """
     type_mapping = {}
-    
+
     for column in data.columns:
         series = data[column]
-        
+
         # Check for numeric types first
         if pd.api.types.is_numeric_dtype(series):
             if pd.api.types.is_integer_dtype(series):
@@ -33,5 +34,5 @@ def infer_data_types(data: pd.DataFrame) -> Dict[str, str]:
         # Everything else is string
         else:
             type_mapping[column] = "string"
-    
+
     return type_mapping
