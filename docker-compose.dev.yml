@@ -1,10 +1,7 @@
 version: '3.8'
 
 services:
-  db-service:
-    image: postgres:16-alpine
-    container_name: dev-db-service
-    hostname: dev-db-serviceervice
+  web-service:
     build:
       context: .
       dockerfile: Dockerfile.dev
