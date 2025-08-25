@@ -255,7 +255,8 @@ setup_development_environment() {
         wheel==0.40.0
     
     # Install development dependencies with hash verification
-    pip install -r requirements-dev.txt --require-hashes
+    # Install development dependencies
+    pip install -r requirements-dev.txt
     
     # Install pre-commit hooks for code quality
     pre-commit install --install-hooks
