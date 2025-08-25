@@ -38,7 +38,7 @@ def workbook_detail(request, pk):
         return Response({"message": f"Workbook {pk} deleted"})
 
 
-@csrf_exempt
+@api_view(["GET"])
 def health_check(request):
     """Health check endpoint."""
-    return JsonResponse({"status": "healthy", "service": "excel-analyzing"})
+    return Response({"status": "healthy", "service": "excel-analyzing"})
