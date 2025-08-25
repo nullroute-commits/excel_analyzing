@@ -143,3 +143,23 @@ def get_settings() -> Settings:
 
 # Global settings instance - will be initialized once at import time
 settings = get_settings()
+
+
+def get_default_settings() -> dict:
+    """Get default settings as a dictionary for regression testing."""
+    default_settings = Settings()
+    return {
+        "app_name": default_settings.app_name,
+        "debug": default_settings.debug,
+        "environment": default_settings.environment.value,
+        "database_host": default_settings.database_host,
+        "database_port": default_settings.database_port,
+        "database_name": default_settings.database_name,
+        "max_file_size_mb": default_settings.max_file_size_mb,
+        "chunk_size": default_settings.chunk_size,
+        "max_sheets_per_workbook": default_settings.max_sheets_per_workbook,
+        "processing_timeout": default_settings.processing_timeout,
+        "max_concurrent_jobs": default_settings.max_concurrent_jobs,
+        "log_level": default_settings.log_level,
+        "allowed_hosts": default_settings.allowed_hosts,
+    }

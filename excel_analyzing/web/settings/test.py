@@ -6,18 +6,11 @@ from ...core.config import settings as app_settings
 # Test specific settings
 DEBUG = False
 
-# Use test database with hostname-based configuration
+# Use SQLite for testing to avoid database connection issues
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": app_settings.database_name,
-        "USER": app_settings.database_user,
-        "PASSWORD": app_settings.database_password,
-        "HOST": app_settings.database_host,
-        "PORT": app_settings.database_port,
-        "TEST": {
-            "NAME": "test_excel_analyzing",
-        },
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": ":memory:",
     }
 }
 
