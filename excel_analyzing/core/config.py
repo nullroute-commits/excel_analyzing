@@ -193,7 +193,9 @@ def get_settings() -> Settings:
 
     # Set environment
     settings.environment = Environment(env)
-
+    # Set environment variable before creating settings instance
+    os.environ["ENVIRONMENT"] = env
+    settings = Settings()
     # Post-process environment-specific overrides
     django_allowed_hosts = os.getenv("DJANGO_ALLOWED_HOSTS")
     if django_allowed_hosts:
