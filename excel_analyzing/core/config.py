@@ -24,33 +24,33 @@ class Settings(BaseSettings):  # type: ignore
     """Application settings with environment-specific configurations."""
 
     model_config = {
-        "env_file": ".env", 
+        "env_file": ".env",
         "env_file_encoding": "utf-8",
         "env_parse_none_str": "None",
-        "use_enum_values": True
+        "use_enum_values": True,
     }
 
     # Application settings
     app_name: str = Field(default="Excel Analyzing", description="Application name")
-    debug: bool = Field(default=False, description="Debug mode flag", alias="DJANGO_DEBUG")
+    debug: bool = Field(default=False, description="Debug mode flag")
     environment: Environment = Field(
         default=Environment.DEVELOPMENT, description="Application environment"
     )
 
     # Database settings (hostname-based)
-    database_host: str = Field(default="db-service", description="Database hostname", alias="DATABASE_HOST")
-    database_port: int = Field(default=5432, description="Database port", alias="DATABASE_PORT")
-    database_name: str = Field(default="excel_analyzing", description="Database name", alias="DATABASE_NAME")
-    database_user: str = Field(default="postgres", description="Database user", alias="DATABASE_USER")
-    database_password: str = Field(default="password", description="Database password", alias="DATABASE_PASSWORD")
+    database_host: str = Field(default="db-service", description="Database hostname")
+    database_port: int = Field(default=5432, description="Database port")
+    database_name: str = Field(default="excel_analyzing", description="Database name")
+    database_user: str = Field(default="postgres", description="Database user")
+    database_password: str = Field(default="password", description="Database password")
     database_pool_size: int = Field(default=10, description="Database pool size")
     database_max_overflow: int = Field(default=20, description="Database max overflow")
 
     # Cache settings (hostname-based)
-    redis_host: str = Field(default="cache-service", description="Redis hostname", alias="REDIS_HOST")
-    redis_port: int = Field(default=6379, description="Redis port", alias="REDIS_PORT")
-    redis_db: int = Field(default=0, description="Redis database", alias="REDIS_DB")
-    redis_password: str = Field(default="", description="Redis password", alias="REDIS_PASSWORD")
+    redis_host: str = Field(default="cache-service", description="Redis hostname")
+    redis_port: int = Field(default=6379, description="Redis port")
+    redis_db: int = Field(default=0, description="Redis database")
+    redis_password: str = Field(default="", description="Redis password")
 
     # Excel processing settings
     max_file_size_mb: int = Field(default=100, description="Max file size in MB")
@@ -72,20 +72,17 @@ class Settings(BaseSettings):  # type: ignore
             "security-tests"
         ),
         description="Django secret key",
-        alias="DJANGO_SECRET_KEY"
     )
     allowed_hosts: List[str] = Field(
-        default=["web-service", "localhost", "127.0.0.1"], 
-        description="Allowed hosts",
-        alias="DJANGO_ALLOWED_HOSTS"
+        default=["web-service", "localhost", "127.0.0.1"], description="Allowed hosts"
     )
 
     # URL settings (hostname-based)
     api_base_url: str = Field(
-        default="http://web-service:8000/api", description="API base URL", alias="API_BASE_URL"
+        default="http://web-service:8000/api", description="API base URL"
     )
     frontend_url: str = Field(
-        default="http://web-service:8000", description="Frontend URL", alias="FRONTEND_URL"
+        default="http://web-service:8000", description="Frontend URL"
     )
 
     # Logging settings
@@ -139,6 +136,27 @@ def get_settings() -> Settings:
     # Define base path for environment configurations
     base_path = Path(__file__).parent.parent.parent / "env"
 
+    # Clear any previously loaded environment variables that might conflict
+    env_vars_to_clear = [
+        "DJANGO_ALLOWED_HOSTS",
+        "DJANGO_SECRET_KEY",
+        "DJANGO_DEBUG",
+        "DATABASE_HOST",
+        "DATABASE_PORT",
+        "DATABASE_NAME",
+        "DATABASE_USER",
+        "DATABASE_PASSWORD",
+        "REDIS_HOST",
+        "REDIS_PORT",
+        "REDIS_DB",
+        "REDIS_PASSWORD",
+        "API_BASE_URL",
+        "FRONTEND_URL",
+    ]
+    for var in env_vars_to_clear:
+        if var in os.environ:
+            del os.environ[var]
+
     # Load configuration files based on service and environment
     env_files = [
         base_path / "web" / "django" / f".env.{env}",
@@ -169,7 +187,29 @@ def get_settings() -> Settings:
         from dotenv import load_dotenv
 
         load_dotenv(env_file, override=True)
-    return Settings()
+
+    # Create settings instance
+    settings = Settings()
+
+    # Set environment
+    settings.environment = Environment(env)
+
+    # Post-process environment-specific overrides
+    django_allowed_hosts = os.getenv("DJANGO_ALLOWED_HOSTS")
+    if django_allowed_hosts:
+        settings.allowed_hosts = [
+            host.strip() for host in django_allowed_hosts.split(",") if host.strip()
+        ]
+
+    django_secret_key = os.getenv("DJANGO_SECRET_KEY")
+    if django_secret_key:
+        settings.django_secret_key = django_secret_key
+
+    django_debug = os.getenv("DJANGO_DEBUG")
+    if django_debug:
+        settings.debug = django_debug.lower() in ("true", "1", "yes", "on")
+
+    return settings
 
 
 # Global settings instance - will be initialized once at import time
