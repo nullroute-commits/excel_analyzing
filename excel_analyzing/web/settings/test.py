@@ -20,9 +20,7 @@ PASSWORD_HASHERS = [
 ]
 
 # Override SECRET_KEY for security tests
-SECRET_KEY = (
-    "test-django-application-that-is-definitely-long-enough-for-testing-requirements-abcd1234"
-)
+SECRET_KEY = "test-django-application-that-is-definitely-long-enough-for-testing-requirements-abcd1234"
 
 
 # Disable migrations for tests

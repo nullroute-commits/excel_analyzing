@@ -9,14 +9,13 @@ from rest_framework.response import Response
 @api_view(["GET"])
 def api_root(request):
     """API root endpoint."""
-    return Response({
-        "message": "Excel Analyzing API",
-        "version": "1.0",
-        "endpoints": {
-            "workbooks": "/api/workbooks/",
-            "health": "/api/health/"
+    return Response(
+        {
+            "message": "Excel Analyzing API",
+            "version": "1.0",
+            "endpoints": {"workbooks": "/api/workbooks/", "health": "/api/health/"},
         }
-    })
+    )
 
 
 @api_view(["GET", "POST"])

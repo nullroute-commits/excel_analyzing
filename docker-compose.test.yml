@@ -22,7 +22,7 @@ services:
     volumes:
       - .:/app
       - ./test_data:/app/test_data
-    command: python -m pytest -v --ignore=tests/e2e --maxfail=50 --disable-warnings --tb=short
+    command: python -m pytest -v --ignore=tests/e2e --maxfail=50 --disable-warnings --tb=short --no-cov
     networks:
       - excel-test-network
 
@@ -48,7 +48,7 @@ services:
     volumes:
       - .:/app
       - ./test_data:/app/test_data
-    command: python -m pytest tests/e2e/ -v --maxfail=10 --disable-warnings --tb=short
+    command: python -m pytest tests/e2e/ -v --maxfail=10 --disable-warnings --tb=short --no-cov
     networks:
       - excel-test-network
 
