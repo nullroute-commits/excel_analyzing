@@ -28,7 +28,7 @@ services:
       - excel-network
 
   db-service:
-    image: postgres:13-alpine
+    image: postgres:16-alpine
     container_name: prod-db-service
     hostname: prod-db-service
     env_file:
@@ -40,7 +40,7 @@ services:
       - excel-network
 
   cache-service:
-    image: redis:7-alpine
+    image: redis:7.4-alpine
     container_name: prod-cache-service
     hostname: prod-cache-service
     env_file:

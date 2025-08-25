@@ -1,0 +1,13 @@
+{
+  "test_name": "serializer_sheet_serializer",
+  "input_data": {},
+  "expected_output": {
+    "id": 1,
+    "name": "Sheet1",
+    "workbook": 1,
+    "row_count": 100,
+    "column_count": 5
+  },
+  "output_hash": "03c157c84e4731d0f416b6cfc94bb23b",
+  "version": "1.0.0"
+}
