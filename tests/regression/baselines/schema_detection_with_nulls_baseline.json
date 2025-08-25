@@ -8,19 +8,19 @@
       {
         "name": "Col1",
         "type": "object",
-        "nullable": "True",
+        "nullable": true,
         "unique_values": 2
       },
       {
         "name": "Col2",
         "type": "float64",
-        "nullable": "True",
+        "nullable": true,
         "unique_values": 2
       },
       {
         "name": "Col3",
         "type": "float64",
-        "nullable": "True",
+        "nullable": true,
         "unique_values": 2
       }
     ]
