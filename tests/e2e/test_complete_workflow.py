@@ -404,7 +404,7 @@ class TestSecurityE2E:
         # Should be rejected due to missing CSRF token
         assert response == 403
     
-    def test_authentication_required(self, page: Page):
+    def test_authentication_required(self, page: Page, base_url):
         """Test that authentication is required for protected resources."""
         
         
