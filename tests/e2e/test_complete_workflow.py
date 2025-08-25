@@ -12,8 +12,7 @@ import json
 @pytest.fixture(scope="session")
 def browser_context(playwright: Playwright):
     """Create a browser context for E2E tests."""
-    browser = playwright.chromium.launch(head    def test_authentication_required(self, page: Page, base_url):
-        """Test that authentication is required for protected pages."""ss=True)
+    browser = playwright.chromium.launch(headless=True)
     context = browser.new_context(
         viewport={'width': 1280, 'height': 720},
         record_video_dir="test-results/videos/"

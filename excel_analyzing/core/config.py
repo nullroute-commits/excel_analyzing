@@ -224,7 +224,7 @@ def get_default_settings() -> dict:
     return {
         "app_name": default_settings.app_name,
         "debug": default_settings.debug,
-        "environment": default_settings.environment.value,
+        "environment": default_settings.environment,
         "database_host": default_settings.database_host,
         "database_port": default_settings.database_port,
         "database_name": default_settings.database_name,

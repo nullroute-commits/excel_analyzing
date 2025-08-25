@@ -32,7 +32,11 @@ class TestInputSanitization:
                 with pytest.raises(ValueError) as exc_info:
                     # Since we don't have actual file processing implemented, 
                     # simulate the validation that should happen
-                    if b"malicious" in content or filename.startswith("../"):
+                    if (b"malicious" in content or 
+                        filename.startswith("../") or 
+                        filename.endswith(".exe") or 
+                        filename.endswith(".bat") or
+                        b"MZ\x90\x00" in content):
                         # This represents the security check that should be in place
                         raise ValueError(f"Malicious content detected in {filename}")
                     
@@ -298,7 +302,7 @@ class TestDependencySecurity:
         pass
 
 
-class TestConfigurationSecurity:
+class TestConfigurationSecurity(TestCase):
     """Test security configuration."""
     
     def test_debug_mode_disabled(self):

@@ -32,6 +32,9 @@ RUN pip install --no-cache-dir -r requirements-prod.txt
 # Stage 3: Application builder
 FROM dependencies AS builder
 
+# Set environment variable for setuptools_scm to avoid git dependency
+ENV SETUPTOOLS_SCM_PRETEND_VERSION_FOR_EXCEL_ANALYZING=0.1.0
+
 # Copy project source code
 COPY . .
 
@@ -39,7 +42,7 @@ COPY . .
 RUN pip install -e .
 
 # Stage 4: Production image
-FROM python:3.11-alpine AS production
+FROM python:3.12-alpine AS production
 
 # Install runtime dependencies only
 RUN apk add --no-cache \
@@ -62,7 +65,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 # Copy Python packages from dependencies stage
-COPY --from=dependencies /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=dependencies /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=dependencies /usr/local/bin /usr/local/bin
 
 # Copy application from builder stage
