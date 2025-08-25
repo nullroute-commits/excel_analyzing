@@ -19,6 +19,9 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
 
+# Override SECRET_KEY for security tests  
+SECRET_KEY = "test-secret-key-that-is-definitely-long-enough-for-security-testing-requirements"
+
 
 # Disable migrations for tests
 class DisableMigrations:
