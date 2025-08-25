@@ -1,0 +1,1023 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.1, pytest-8.4.1, pluggy-1.6.0
+django: version: 5.2.5, settings: excel_analyzing.web.settings.test (from ini)
+rootdir: /workspaces/excel_analyzing/tests
+configfile: ../pyproject.toml
+plugins: anyio-4.9.0, Faker-37.5.3, base-url-2.1.0, django-4.11.1, cov-6.2.1, playwright-0.7.0
+collected 114 items
+
+tests/integration/test_web_integration.py FFFFFFFF...                    [  9%]
+tests/security/test_security_suite.py FFFF.                              [ 14%]
+tests/e2e/test_complete_workflow.py EEEEEEEEEEFEEEEF                     [ 28%]
+tests/integration/test_pipeline_integration.py .......                   [ 34%]
+tests/performance/test_performance_suite.py ..............               [ 46%]
+tests/regression/test_regression_suite.py .........                      [ 54%]
+tests/security/test_security_suite.py F..............F.....              [ 72%]
+tests/unit/test_models.py ..............                                 [ 85%]
+tests/unit/test_processor.py .................                           [100%]
+
+==================================== ERRORS ====================================
+___ ERROR at setup of TestCompleteWorkflow.test_user_registration_and_login ____
+tests/e2e/test_complete_workflow.py:15: in browser_context
+    browser = playwright.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+---------------------------- Captured stderr setup -----------------------------
+2025-08-25 04:40:29,842 - asyncio - DEBUG - Using selector: EpollSelector
+------------------------------ Captured log setup ------------------------------
+DEBUG    asyncio:selector_events.py:64 Using selector: EpollSelector
+___ ERROR at setup of TestCompleteWorkflow.test_excel_upload_and_processing ____
+tests/e2e/test_complete_workflow.py:15: in browser_context
+    browser = playwright.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+____ ERROR at setup of TestCompleteWorkflow.test_data_exploration_workflow _____
+tests/e2e/test_complete_workflow.py:15: in browser_context
+    browser = playwright.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+____ ERROR at setup of TestCompleteWorkflow.test_data_filtering_and_search _____
+tests/e2e/test_complete_workflow.py:15: in browser_context
+    browser = playwright.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+_______ ERROR at setup of TestCompleteWorkflow.test_data_export_workflow _______
+tests/e2e/test_complete_workflow.py:15: in browser_context
+    browser = playwright.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+_____ ERROR at setup of TestCompleteWorkflow.test_api_integration_workflow _____
+tests/e2e/test_complete_workflow.py:15: in browser_context
+    browser = playwright.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+_____ ERROR at setup of TestCompleteWorkflow.test_error_handling_workflow ______
+tests/e2e/test_complete_workflow.py:15: in browser_context
+    browser = playwright.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+___ ERROR at setup of TestCompleteWorkflow.test_performance_user_experience ____
+tests/e2e/test_complete_workflow.py:15: in browser_context
+    browser = playwright.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+______ ERROR at setup of TestCompleteWorkflow.test_mobile_responsiveness _______
+tests/e2e/test_complete_workflow.py:15: in browser_context
+    browser = playwright.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+_____ ERROR at setup of TestCompleteWorkflow.test_accessibility_compliance _____
+tests/e2e/test_complete_workflow.py:15: in browser_context
+    browser = playwright.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+____________ ERROR at setup of TestSecurityE2E.test_xss_protection _____________
+tests/e2e/test_complete_workflow.py:15: in browser_context
+    browser = playwright.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+____________ ERROR at setup of TestSecurityE2E.test_csrf_protection ____________
+tests/e2e/test_complete_workflow.py:15: in browser_context
+    browser = playwright.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+________ ERROR at setup of TestSecurityE2E.test_authentication_required ________
+tests/e2e/test_complete_workflow.py:15: in browser_context
+    browser = playwright.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+___ ERROR at setup of TestPerformanceE2E.test_large_file_upload_performance ____
+tests/e2e/test_complete_workflow.py:15: in browser_context
+    browser = playwright.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+=================================== FAILURES ===================================
+_______________ TestWebInterfaceIntegration.test_home_page_loads _______________
+tests/integration/test_web_integration.py:27: in test_home_page_loads
+    response = self.client.get('/')
+               ^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1124: in get
+    response = super().get(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:475: in get
+    return self.generic(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1082: in request
+    response = self.handler(environ)
+               ^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:173: in __call__
+    self.load_middleware()
+/home/codespace/.local/lib/python3.12/site-packages/django/core/handlers/base.py:40: in load_middleware
+    middleware = import_string(middleware_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:30: in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:15: in cached_import
+    module = import_module(module_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'whitenoise'
+---------------------------- Captured stderr setup -----------------------------
+2025-08-25 04:40:27,443 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.address`.
+2025-08-25 04:40:27,447 - faker.factory - DEBUG - Provider `faker.providers.address` has been localized to `en_US`.
+2025-08-25 04:40:27,493 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.automotive`.
+2025-08-25 04:40:27,495 - faker.factory - DEBUG - Provider `faker.providers.automotive` has been localized to `en_US`.
+2025-08-25 04:40:27,497 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.bank`.
+2025-08-25 04:40:27,499 - faker.factory - DEBUG - Specified locale `en_US` is not available for provider `faker.providers.bank`. Locale reset to `en_GB` for this provider.
+2025-08-25 04:40:27,500 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.barcode`.
+2025-08-25 04:40:27,501 - faker.factory - DEBUG - Provider `faker.providers.barcode` has been localized to `en_US`.
+2025-08-25 04:40:27,509 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.color`.
+2025-08-25 04:40:27,511 - faker.factory - DEBUG - Provider `faker.providers.color` has been localized to `en_US`.
+2025-08-25 04:40:27,512 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.company`.
+2025-08-25 04:40:27,514 - faker.factory - DEBUG - Provider `faker.providers.company` has been localized to `en_US`.
+2025-08-25 04:40:27,515 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.credit_card`.
+2025-08-25 04:40:27,516 - faker.factory - DEBUG - Provider `faker.providers.credit_card` has been localized to `en_US`.
+2025-08-25 04:40:27,517 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.currency`.
+2025-08-25 04:40:27,519 - faker.factory - DEBUG - Provider `faker.providers.currency` has been localized to `en_US`.
+2025-08-25 04:40:27,521 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.date_time`.
+2025-08-25 04:40:27,524 - faker.factory - DEBUG - Provider `faker.providers.date_time` has been localized to `en_US`.
+2025-08-25 04:40:27,525 - faker.factory - DEBUG - Provider `faker.providers.doi` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2025-08-25 04:40:27,525 - faker.factory - DEBUG - Provider `faker.providers.emoji` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2025-08-25 04:40:27,525 - faker.factory - DEBUG - Provider `faker.providers.file` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2025-08-25 04:40:27,526 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.geo`.
+2025-08-25 04:40:27,527 - faker.factory - DEBUG - Provider `faker.providers.geo` has been localized to `en_US`.
+2025-08-25 04:40:27,528 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.internet`.
+2025-08-25 04:40:27,530 - faker.factory - DEBUG - Provider `faker.providers.internet` has been localized to `en_US`.
+2025-08-25 04:40:27,531 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.isbn`.
+2025-08-25 04:40:27,532 - faker.factory - DEBUG - Provider `faker.providers.isbn` has been localized to `en_US`.
+2025-08-25 04:40:27,533 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.job`.
+2025-08-25 04:40:27,538 - faker.factory - DEBUG - Provider `faker.providers.job` has been localized to `en_US`.
+2025-08-25 04:40:27,540 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.lorem`.
+2025-08-25 04:40:27,543 - faker.factory - DEBUG - Provider `faker.providers.lorem` has been localized to `en_US`.
+2025-08-25 04:40:27,543 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.misc`.
+2025-08-25 04:40:27,544 - faker.factory - DEBUG - Provider `faker.providers.misc` has been localized to `en_US`.
+2025-08-25 04:40:27,546 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.passport`.
+2025-08-25 04:40:27,546 - faker.factory - DEBUG - Provider `faker.providers.passport` has been localized to `en_US`.
+2025-08-25 04:40:27,548 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.person`.
+2025-08-25 04:40:27,555 - faker.factory - DEBUG - Provider `faker.providers.person` has been localized to `en_US`.
+2025-08-25 04:40:27,566 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.phone_number`.
+2025-08-25 04:40:27,573 - faker.factory - DEBUG - Provider `faker.providers.phone_number` has been localized to `en_US`.
+2025-08-25 04:40:27,575 - faker.factory - DEBUG - Provider `faker.providers.profile` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2025-08-25 04:40:27,576 - faker.factory - DEBUG - Provider `faker.providers.python` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2025-08-25 04:40:27,576 - faker.factory - DEBUG - Provider `faker.providers.sbn` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2025-08-25 04:40:27,577 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.ssn`.
+2025-08-25 04:40:27,580 - faker.factory - DEBUG - Provider `faker.providers.ssn` has been localized to `en_US`.
+2025-08-25 04:40:27,582 - faker.factory - DEBUG - Provider `faker.providers.user_agent` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+------------------------------ Captured log setup ------------------------------
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.address`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.address` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.automotive`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.automotive` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.bank`.
+DEBUG    faker.factory:factory.py:88 Specified locale `en_US` is not available for provider `faker.providers.bank`. Locale reset to `en_GB` for this provider.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.barcode`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.barcode` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.color`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.color` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.company`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.company` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.credit_card`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.credit_card` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.currency`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.currency` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.date_time`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.date_time` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:108 Provider `faker.providers.doi` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG    faker.factory:factory.py:108 Provider `faker.providers.emoji` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG    faker.factory:factory.py:108 Provider `faker.providers.file` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.geo`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.geo` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.internet`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.internet` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.isbn`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.isbn` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.job`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.job` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.lorem`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.lorem` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.misc`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.misc` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.passport`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.passport` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.person`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.person` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.phone_number`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.phone_number` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:108 Provider `faker.providers.profile` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG    faker.factory:factory.py:108 Provider `faker.providers.python` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG    faker.factory:factory.py:108 Provider `faker.providers.sbn` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+DEBUG    faker.factory:factory.py:78 Looking for locale `en_US` in provider `faker.providers.ssn`.
+DEBUG    faker.factory:factory.py:97 Provider `faker.providers.ssn` has been localized to `en_US`.
+DEBUG    faker.factory:factory.py:108 Provider `faker.providers.user_agent` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+__________ TestWebInterfaceIntegration.test_user_authentication_flow ___________
+tests/integration/test_web_integration.py:33: in test_user_authentication_flow
+    login_url = reverse('login') if 'login' in [url.name for url in get_urlpatterns()] else '/login/'
+                                                ^^^^^^^^
+E   AttributeError: 'URLResolver' object has no attribute 'name'
+__________ TestWebInterfaceIntegration.test_workbook_upload_workflow ___________
+tests/integration/test_web_integration.py:67: in test_workbook_upload_workflow
+    response = self.client.post(upload_url, upload_data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1153: in post
+    response = super().post(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:499: in post
+    return self.generic(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1082: in request
+    response = self.handler(environ)
+               ^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:173: in __call__
+    self.load_middleware()
+/home/codespace/.local/lib/python3.12/site-packages/django/core/handlers/base.py:40: in load_middleware
+    middleware = import_string(middleware_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:30: in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:15: in cached_import
+    module = import_module(module_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'whitenoise'
+_____________ TestAPIIntegration.test_api_endpoints_accessibility ______________
+tests/integration/test_web_integration.py:104: in test_api_endpoints_accessibility
+    response = self.client.get(endpoint)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:292: in get
+    response = super().get(path, data=data, **extra)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:209: in get
+    return self.generic('GET', path, **r)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:237: in generic
+    return super().generic(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:289: in request
+    return super().request(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:241: in request
+    request = super().request(**kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1082: in request
+    response = self.handler(environ)
+               ^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:173: in __call__
+    self.load_middleware()
+/home/codespace/.local/lib/python3.12/site-packages/django/core/handlers/base.py:40: in load_middleware
+    middleware = import_string(middleware_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:30: in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:15: in cached_import
+    module = import_module(module_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'whitenoise'
+__________________ TestAPIIntegration.test_api_error_handling __________________
+tests/integration/test_web_integration.py:157: in test_api_error_handling
+    response = self.client.post('/api/workbooks/', invalid_data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:299: in post
+    response = super().post(
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:213: in post
+    return self.generic('POST', path, data, content_type, **extra)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:237: in generic
+    return super().generic(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:289: in request
+    return super().request(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:241: in request
+    request = super().request(**kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1082: in request
+    response = self.handler(environ)
+               ^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:173: in __call__
+    self.load_middleware()
+/home/codespace/.local/lib/python3.12/site-packages/django/core/handlers/base.py:40: in load_middleware
+    middleware = import_string(middleware_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:30: in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:15: in cached_import
+    module = import_module(module_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'whitenoise'
+___________________ TestAPIIntegration.test_api_permissions ____________________
+tests/integration/test_web_integration.py:168: in test_api_permissions
+    response = self.client.get('/api/workbooks/')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:292: in get
+    response = super().get(path, data=data, **extra)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:209: in get
+    return self.generic('GET', path, **r)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:237: in generic
+    return super().generic(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:289: in request
+    return super().request(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:241: in request
+    request = super().request(**kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1082: in request
+    response = self.handler(environ)
+               ^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:173: in __call__
+    self.load_middleware()
+/home/codespace/.local/lib/python3.12/site-packages/django/core/handlers/base.py:40: in load_middleware
+    middleware = import_string(middleware_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:30: in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:15: in cached_import
+    module = import_module(module_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'whitenoise'
+____________________ TestAPIIntegration.test_data_query_api ____________________
+tests/integration/test_web_integration.py:150: in test_data_query_api
+    response = self.client.post('/api/query/', query_data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:299: in post
+    response = super().post(
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:212: in post
+    data, content_type = self._encode_data(data, format, content_type)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:183: in _encode_data
+    ret = renderer.render(data)
+          ^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/renderers.py:915: in render
+    assert not isinstance(value, dict), (
+E   AssertionError: Test data contained a dictionary value for key 'filters', but multipart uploads do not support nested data. You may want to consider using format='json' in this test case.
+__________________ TestAPIIntegration.test_workbook_api_crud ___________________
+tests/integration/test_web_integration.py:111: in test_workbook_api_crud
+    response = self.client.get('/api/workbooks/')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:292: in get
+    response = super().get(path, data=data, **extra)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:209: in get
+    return self.generic('GET', path, **r)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:237: in generic
+    return super().generic(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:289: in request
+    return super().request(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/rest_framework/test.py:241: in request
+    request = super().request(**kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1082: in request
+    response = self.handler(environ)
+               ^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:173: in __call__
+    self.load_middleware()
+/home/codespace/.local/lib/python3.12/site-packages/django/core/handlers/base.py:40: in load_middleware
+    middleware = import_string(middleware_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:30: in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:15: in cached_import
+    module = import_module(module_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'whitenoise'
+__________________ TestWebSecurityDjango.test_csrf_protection __________________
+tests/security/test_security_suite.py:157: in test_csrf_protection
+    response = self.client.post('/api/workbooks/', {'name': 'test'})
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1153: in post
+    response = super().post(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:499: in post
+    return self.generic(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1082: in request
+    response = self.handler(environ)
+               ^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:173: in __call__
+    self.load_middleware()
+/home/codespace/.local/lib/python3.12/site-packages/django/core/handlers/base.py:40: in load_middleware
+    middleware = import_string(middleware_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:30: in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:15: in cached_import
+    module = import_module(module_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'whitenoise'
+_________________ TestWebSecurityDjango.test_security_headers __________________
+tests/security/test_security_suite.py:198: in test_security_headers
+    response = self.client.get('/')
+               ^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1124: in get
+    response = super().get(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:475: in get
+    return self.generic(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1082: in request
+    response = self.handler(environ)
+               ^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:173: in __call__
+    self.load_middleware()
+/home/codespace/.local/lib/python3.12/site-packages/django/core/handlers/base.py:40: in load_middleware
+    middleware = import_string(middleware_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:30: in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:15: in cached_import
+    module = import_module(module_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'whitenoise'
+______________ TestWebSecurityDjango.test_sensitive_data_exposure ______________
+tests/security/test_security_suite.py:217: in test_sensitive_data_exposure
+    response = self.client.get('/api/nonexistent/')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1124: in get
+    response = super().get(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:475: in get
+    return self.generic(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1082: in request
+    response = self.handler(environ)
+               ^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:173: in __call__
+    self.load_middleware()
+/home/codespace/.local/lib/python3.12/site-packages/django/core/handlers/base.py:40: in load_middleware
+    middleware = import_string(middleware_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:30: in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:15: in cached_import
+    module = import_module(module_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'whitenoise'
+_____________ TestWebSecurityDjango.test_sql_injection_prevention ______________
+tests/security/test_security_suite.py:177: in test_sql_injection_prevention
+    response = self.client.get(endpoint)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1124: in get
+    response = super().get(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:475: in get
+    return self.generic(
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:1082: in request
+    response = self.handler(environ)
+               ^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/test/client.py:173: in __call__
+    self.load_middleware()
+/home/codespace/.local/lib/python3.12/site-packages/django/core/handlers/base.py:40: in load_middleware
+    middleware = import_string(middleware_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:30: in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/home/codespace/.local/lib/python3.12/site-packages/django/utils/module_loading.py:15: in cached_import
+    module = import_module(module_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'whitenoise'
+____________ TestCompleteWorkflow.test_cross_browser_compatibility _____________
+tests/e2e/test_complete_workflow.py:332: in test_cross_browser_compatibility
+    browser = getattr(playwright, browser_name).launch()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+_____________ TestPerformanceE2E.test_concurrent_user_performance ______________
+tests/e2e/test_complete_workflow.py:449: in test_concurrent_user_performance
+    browser = playwright.chromium.launch()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/sync_api/_generated.py:14494: in launch
+    self._sync(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_browser_type.py:98: in launch
+    await self._channel.send(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+/usr/local/python/3.12.1/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/codespace/.cache/ms-playwright/chromium_headless_shell-1181/chrome-linux/headless_shell
+E   ╔════════════════════════════════════════════════════════════╗
+E   ║ Looks like Playwright was just installed or updated.       ║
+E   ║ Please run the following command to download new browsers: ║
+E   ║                                                            ║
+E   ║     playwright install                                     ║
+E   ║                                                            ║
+E   ║ <3 Playwright Team                                         ║
+E   ╚════════════════════════════════════════════════════════════╝
+_______________ TestInputSanitization.test_malicious_file_upload _______________
+tests/security/test_security_suite.py:32: in test_malicious_file_upload
+    with pytest.raises(ValueError) as exc_info:
+E   Failed: DID NOT RAISE <class 'ValueError'>
+______________ TestConfigurationSecurity.test_secret_key_security ______________
+tests/security/test_security_suite.py:329: in test_secret_key_security
+    self.assertNotIn(default, settings.SECRET_KEY.lower())
+    ^^^^^^^^^^^^^^^^
+E   AttributeError: 'TestConfigurationSecurity' object has no attribute 'assertNotIn'
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.1-final-0 ________________
+
+Name                                                                      Stmts   Miss  Cover   Missing
+-------------------------------------------------------------------------------------------------------
+excel_analyzing/__init__.py                                                   3      0   100%
+excel_analyzing/_version.py                                                  17     17     0%   4-33
+excel_analyzing/cli.py                                                      166    166     0%   3-346
+excel_analyzing/core/__init__.py                                              0      0   100%
+excel_analyzing/core/cleaning.py                                             17      7    59%   29-37
+excel_analyzing/core/config.py                                               74      4    95%   87, 94, 102, 124
+excel_analyzing/core/data_types.py                                           16      2    88%   29, 32
+excel_analyzing/core/schema.py                                               16      0   100%
+excel_analyzing/models/__init__.py                                            0      0   100%
+excel_analyzing/models/database.py                                           72      2    97%   157, 161
+excel_analyzing/models/schemas.py                                            92      1    99%   153
+excel_analyzing/pipeline/__init__.py                                          0      0   100%
+excel_analyzing/pipeline/orchestrator.py                                    147     64    56%   39, 42-44, 47, 58-61, 70, 74, 80-86, 107-122, 188-245, 266-289, 302-352
+excel_analyzing/pipeline/processor.py                                       184     44    76%   40, 58-59, 78-82, 93-95, 110-112, 118, 124, 288, 306-307, 317-321, 331-356, 366-378
+excel_analyzing/utils/__init__.py                                             0      0   100%
+excel_analyzing/utils/files.py                                               52     52     0%   3-97
+excel_analyzing/utils/logging.py                                             34     34     0%   3-97
+excel_analyzing/web/__init__.py                                               0      0   100%
+excel_analyzing/web/apps/__init__.py                                          0      0   100%
+excel_analyzing/web/apps/workbooks/__init__.py                                5      0   100%
+excel_analyzing/web/apps/workbooks/management/__init__.py                     0      0   100%
+excel_analyzing/web/apps/workbooks/management/commands/__init__.py            0      0   100%
+excel_analyzing/web/apps/workbooks/management/commands/process_excel.py      40     40     0%   3-99
+excel_analyzing/web/apps/workbooks/urls.py                                    4      0   100%
+excel_analyzing/web/apps/workbooks/views.py                                  32     12    62%   15-17, 31-33, 45-47, 57-59
+excel_analyzing/web/asgi.py                                                   4      4     0%   3-11
+excel_analyzing/web/settings/__init__.py                                      0      0   100%
+excel_analyzing/web/settings/base.py                                         30      0   100%
+excel_analyzing/web/settings/development.py                                   8      8     0%   3-36
+excel_analyzing/web/settings/production.py                                   23     23     0%   3-40
+excel_analyzing/web/settings/test.py                                         16      0   100%
+excel_analyzing/web/urls.py                                                   3      0   100%
+excel_analyzing/web/wsgi.py                                                   4      4     0%   3-11
+-------------------------------------------------------------------------------------------------------
+TOTAL                                                                      1059    484    54%
+Coverage HTML written to dir htmlcov
+=========================== short test summary info ============================
+FAILED tests/integration/test_web_integration.py::TestWebInterfaceIntegration::test_home_page_loads
+FAILED tests/integration/test_web_integration.py::TestWebInterfaceIntegration::test_user_authentication_flow
+FAILED tests/integration/test_web_integration.py::TestWebInterfaceIntegration::test_workbook_upload_workflow
+FAILED tests/integration/test_web_integration.py::TestAPIIntegration::test_api_endpoints_accessibility
+FAILED tests/integration/test_web_integration.py::TestAPIIntegration::test_api_error_handling
+FAILED tests/integration/test_web_integration.py::TestAPIIntegration::test_api_permissions
+FAILED tests/integration/test_web_integration.py::TestAPIIntegration::test_data_query_api
+FAILED tests/integration/test_web_integration.py::TestAPIIntegration::test_workbook_api_crud
+FAILED tests/security/test_security_suite.py::TestWebSecurityDjango::test_csrf_protection
+FAILED tests/security/test_security_suite.py::TestWebSecurityDjango::test_security_headers
+FAILED tests/security/test_security_suite.py::TestWebSecurityDjango::test_sensitive_data_exposure
+FAILED tests/security/test_security_suite.py::TestWebSecurityDjango::test_sql_injection_prevention
+FAILED tests/e2e/test_complete_workflow.py::TestCompleteWorkflow::test_cross_browser_compatibility
+FAILED tests/e2e/test_complete_workflow.py::TestPerformanceE2E::test_concurrent_user_performance
+FAILED tests/security/test_security_suite.py::TestInputSanitization::test_malicious_file_upload
+FAILED tests/security/test_security_suite.py::TestConfigurationSecurity::test_secret_key_security
+ERROR tests/e2e/test_complete_workflow.py::TestCompleteWorkflow::test_user_registration_and_login
+ERROR tests/e2e/test_complete_workflow.py::TestCompleteWorkflow::test_excel_upload_and_processing
+ERROR tests/e2e/test_complete_workflow.py::TestCompleteWorkflow::test_data_exploration_workflow
+ERROR tests/e2e/test_complete_workflow.py::TestCompleteWorkflow::test_data_filtering_and_search
+ERROR tests/e2e/test_complete_workflow.py::TestCompleteWorkflow::test_data_export_workflow
+ERROR tests/e2e/test_complete_workflow.py::TestCompleteWorkflow::test_api_integration_workflow
+ERROR tests/e2e/test_complete_workflow.py::TestCompleteWorkflow::test_error_handling_workflow
+ERROR tests/e2e/test_complete_workflow.py::TestCompleteWorkflow::test_performance_user_experience
+ERROR tests/e2e/test_complete_workflow.py::TestCompleteWorkflow::test_mobile_responsiveness
+ERROR tests/e2e/test_complete_workflow.py::TestCompleteWorkflow::test_accessibility_compliance
+ERROR tests/e2e/test_complete_workflow.py::TestSecurityE2E::test_xss_protection
+ERROR tests/e2e/test_complete_workflow.py::TestSecurityE2E::test_csrf_protection
+ERROR tests/e2e/test_complete_workflow.py::TestSecurityE2E::test_authentication_required
+ERROR tests/e2e/test_complete_workflow.py::TestPerformanceE2E::test_large_file_upload_performance
+============ 16 failed, 84 passed, 17 warnings, 14 errors in 50.66s ============

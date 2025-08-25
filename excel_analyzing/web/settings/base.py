@@ -75,8 +75,7 @@ DATABASES = {
         "PASSWORD": app_settings.database_password,
         "HOST": app_settings.database_host,
         "PORT": app_settings.database_port,
-        "OPTIONS": {
-        },
+        "OPTIONS": {},
         "CONN_MAX_AGE": app_settings.database_pool_size,
     }
 }
@@ -145,7 +144,7 @@ LOGGING = {
         },
         "file": {
             "class": "logging.FileHandler",
-            "filename": "django.log",
+            "filename": "/app/logs/django.log",
             "formatter": "verbose",
         },
     },

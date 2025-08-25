@@ -22,7 +22,33 @@ services:
     volumes:
       - .:/app
       - ./test_data:/app/test_data
-    command: python -m pytest -v
+    command: python -m pytest -v --ignore=tests/e2e --maxfail=50 --disable-warnings --tb=short
+    networks:
+      - excel-test-network
+
+  e2e-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.e2e
+    container_name: test-e2e-service
+    hostname: test-e2e-service
+    env_file:
+      - ./env/web/django/.env.test
+      - ./env/processing/core/.env.test
+    environment:
+      - ENVIRONMENT=test
+      - DATABASE_HOST=test-db-service
+      - REDIS_HOST=test-cache-service
+      - WEB_SERVICE_URL=http://test-web-service:8000
+      - BASE_URL=http://test-web-service:8000
+    depends_on:
+      - web-service
+      - db-service
+      - cache-service
+    volumes:
+      - .:/app
+      - ./test_data:/app/test_data
+    command: python -m pytest tests/e2e/ -v --maxfail=10 --disable-warnings --tb=short
     networks:
       - excel-test-network
 

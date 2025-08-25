@@ -23,7 +23,12 @@ class Environment(str, Enum):
 class Settings(BaseSettings):  # type: ignore
     """Application settings with environment-specific configurations."""
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    model_config = {
+        "env_file": ".env",
+        "env_file_encoding": "utf-8",
+        "env_parse_none_str": "None",
+        "use_enum_values": True,
+    }
 
     # Application settings
     app_name: str = Field(default="Excel Analyzing", description="Application name")
@@ -53,20 +58,32 @@ class Settings(BaseSettings):  # type: ignore
     max_sheets_per_workbook: int = Field(
         default=50, description="Max sheets per workbook"
     )
-    processing_timeout: int = Field(default=300, description="Processing timeout in seconds")
-    max_concurrent_jobs: int = Field(default=4, description="Max concurrent processing jobs")
+    processing_timeout: int = Field(
+        default=300, description="Processing timeout in seconds"
+    )
+    max_concurrent_jobs: int = Field(
+        default=4, description="Max concurrent processing jobs"
+    )
 
     # Django settings
     django_secret_key: str = Field(
-        default="dev-secret-key-change-in-production-this-is-long-enough-for-security-tests", description="Django secret key"
+        default=(
+            "dev-secret-key-change-in-production-this-is-long-enough-for-"
+            "security-tests"
+        ),
+        description="Django secret key",
     )
     allowed_hosts: List[str] = Field(
         default=["web-service", "localhost", "127.0.0.1"], description="Allowed hosts"
     )
 
     # URL settings (hostname-based)
-    api_base_url: str = Field(default="http://web-service:8000/api", description="API base URL")
-    frontend_url: str = Field(default="http://web-service:8000", description="Frontend URL")
+    api_base_url: str = Field(
+        default="http://web-service:8000/api", description="API base URL"
+    )
+    frontend_url: str = Field(
+        default="http://web-service:8000", description="Frontend URL"
+    )
 
     # Logging settings
     log_level: str = Field(default="INFO", description="Log level")
@@ -78,20 +95,29 @@ class Settings(BaseSettings):  # type: ignore
     @property
     def database_url(self) -> str:
         """Construct database URL from hostname-based components."""
-        return f"postgresql://{self.database_user}:{self.database_password}@{self.database_host}:{self.database_port}/{self.database_name}"
+        return (
+            f"postgresql://{self.database_user}:{self.database_password}@"
+            f"{self.database_host}:{self.database_port}/{self.database_name}"
+        )
 
     @property
     def redis_url(self) -> str:
         """Construct Redis URL from hostname-based components."""
         if self.redis_password:
-            return f"redis://:{self.redis_password}@{self.redis_host}:{self.redis_port}/{self.redis_db}"
+            return (
+                f"redis://:{self.redis_password}@{self.redis_host}:"
+                f"{self.redis_port}/{self.redis_db}"
+            )
         return f"redis://{self.redis_host}:{self.redis_port}/{self.redis_db}"
 
     @validator("allowed_hosts", pre=True)
     def parse_allowed_hosts(cls, v: Any) -> List[str]:
         """Parse comma-separated allowed hosts."""
         if isinstance(v, str):
-            return [host.strip() for host in v.split(",")]
+            # Handle comma-separated values from environment variables
+            return [host.strip() for host in v.split(",") if host.strip()]
+        elif isinstance(v, list):
+            return v
         return v
 
     @validator("environment", pre=True)
@@ -106,10 +132,31 @@ def get_settings() -> Settings:
     """Get application settings instance with environment-specific configuration."""
     # Get current environment
     env = os.getenv("ENVIRONMENT", "development")
-    
+
     # Define base path for environment configurations
     base_path = Path(__file__).parent.parent.parent / "env"
-    
+
+    # Clear any previously loaded environment variables that might conflict
+    env_vars_to_clear = [
+        "DJANGO_ALLOWED_HOSTS",
+        "DJANGO_SECRET_KEY",
+        "DJANGO_DEBUG",
+        "DATABASE_HOST",
+        "DATABASE_PORT",
+        "DATABASE_NAME",
+        "DATABASE_USER",
+        "DATABASE_PASSWORD",
+        "REDIS_HOST",
+        "REDIS_PORT",
+        "REDIS_DB",
+        "REDIS_PASSWORD",
+        "API_BASE_URL",
+        "FRONTEND_URL",
+    ]
+    for var in env_vars_to_clear:
+        if var in os.environ:
+            del os.environ[var]
+
     # Load configuration files based on service and environment
     env_files = [
         base_path / "web" / "django" / f".env.{env}",
@@ -117,15 +164,15 @@ def get_settings() -> Settings:
         base_path / "cache" / "redis" / f".env.{env}",
         base_path / "processing" / "core" / f".env.{env}",
     ]
-    
+
     # Add root .env file if it exists
     root_env = base_path.parent / ".env"
     if root_env.exists():
         env_files.append(root_env)
-    
+
     # Filter existing files and convert to strings
     existing_env_files = [str(f) for f in env_files if f.exists()]
-    
+
     # Load environment variables from files
     # Environment files are loaded in the following order:
     #   1. web/django/.env.{env}
@@ -133,12 +180,38 @@ def get_settings() -> Settings:
     #   3. cache/redis/.env.{env}
     #   4. processing/core/.env.{env}
     #   5. root .env (if exists)
-    # Because override=True is used, variables from later files will override those from earlier files.
+    # Because override=True is used, variables from later files will override
+    # those from earlier files.
     # This makes the last file in the list highest precedence.
     for env_file in existing_env_files:
         from dotenv import load_dotenv
+
         load_dotenv(env_file, override=True)
-    return Settings()
+
+    # Create settings instance
+    settings = Settings()
+
+    # Set environment
+    settings.environment = Environment(env)
+    # Set environment variable before creating settings instance
+    os.environ["ENVIRONMENT"] = env
+    settings = Settings()
+    # Post-process environment-specific overrides
+    django_allowed_hosts = os.getenv("DJANGO_ALLOWED_HOSTS")
+    if django_allowed_hosts:
+        settings.allowed_hosts = [
+            host.strip() for host in django_allowed_hosts.split(",") if host.strip()
+        ]
+
+    django_secret_key = os.getenv("DJANGO_SECRET_KEY")
+    if django_secret_key:
+        settings.django_secret_key = django_secret_key
+
+    django_debug = os.getenv("DJANGO_DEBUG")
+    if django_debug:
+        settings.debug = django_debug.lower() in ("true", "1", "yes", "on")
+
+    return settings
 
 
 # Global settings instance - will be initialized once at import time
