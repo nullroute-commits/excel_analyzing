@@ -1,0 +1,25 @@
+{
+  "test_name": "default_settings",
+  "input_data": {},
+  "expected_output": {
+    "app_name": "Excel Analyzing",
+    "debug": true,
+    "environment": "development",
+    "database_host": "db-service",
+    "database_port": 5432,
+    "database_name": "excel_analyzing_dev",
+    "max_file_size_mb": 100,
+    "chunk_size": 1000,
+    "max_sheets_per_workbook": 50,
+    "processing_timeout": 300,
+    "max_concurrent_jobs": 2,
+    "log_level": "DEBUG",
+    "allowed_hosts": [
+      "web-service",
+      "localhost",
+      "127.0.0.1"
+    ]
+  },
+  "output_hash": "f4f194d509b8e89f3d8a6b2e719b6d76",
+  "version": "1.0.0"
+}

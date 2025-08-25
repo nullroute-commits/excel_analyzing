@@ -1,0 +1,12 @@
+{
+  "test_name": "api_response_workbooks_list",
+  "input_data": {},
+  "expected_output": {
+    "count": 0,
+    "next": null,
+    "previous": null,
+    "results": []
+  },
+  "output_hash": "97aeb00ebaa9dda89cb0f42c8ac18a5a",
+  "version": "1.0.0"
+}

@@ -152,14 +152,16 @@ class TestDataProcessingRegression(RegressionTestBase):
             
             # Convert schema to serializable format
             schema_dict = {
+                "total_rows": schema["total_rows"],
+                "total_columns": schema["total_columns"],
                 "columns": [
                     {
-                        "name": col.name,
-                        "type": str(col.type),
-                        "nullable": col.nullable,
-                        "constraints": col.constraints
+                        "name": col["name"],
+                        "type": col["dtype"],
+                        "nullable": col["nullable"],
+                        "unique_values": col["unique_values"]
                     }
-                    for col in schema.columns
+                    for col in schema["columns"]
                 ]
             }
             

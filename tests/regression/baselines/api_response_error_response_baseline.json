@@ -1,0 +1,11 @@
+{
+  "test_name": "api_response_error_response",
+  "input_data": {},
+  "expected_output": {
+    "error": "Not found",
+    "code": 404,
+    "message": "The requested resource was not found"
+  },
+  "output_hash": "10e298bdb433e06c49c799edfc423401",
+  "version": "1.0.0"
+}
