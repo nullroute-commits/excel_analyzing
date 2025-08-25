@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile for Excel Analyzing
 # Stage 1: Base image with system dependencies
-FROM python:3.11-alpine AS base
+FROM python:3.12-alpine AS base
 
 # Install system dependencies required for Python packages
 RUN apk add --no-cache \
