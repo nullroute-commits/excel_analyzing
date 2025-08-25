@@ -188,14 +188,12 @@ def get_settings() -> Settings:
 
         load_dotenv(env_file, override=True)
 
+    # Set environment variable before creating settings instance
+    os.environ["ENVIRONMENT"] = env
+
     # Create settings instance
     settings = Settings()
 
-    # Set environment
-    settings.environment = Environment(env)
-    # Set environment variable before creating settings instance
-    os.environ["ENVIRONMENT"] = env
-    settings = Settings()
     # Post-process environment-specific overrides
     django_allowed_hosts = os.getenv("DJANGO_ALLOWED_HOSTS")
     if django_allowed_hosts:
@@ -221,10 +219,19 @@ settings = get_settings()
 def get_default_settings() -> dict:
     """Get default settings as a dictionary for regression testing."""
     default_settings = Settings()
+
+    # Handle environment field which might be str or Environment enum
+    env_value: str
+    raw_env = default_settings.environment
+    if hasattr(raw_env, "value"):
+        env_value = raw_env.value
+    else:
+        env_value = str(raw_env)
+
     return {
         "app_name": default_settings.app_name,
         "debug": default_settings.debug,
-        "environment": default_settings.environment.value,
+        "environment": env_value,
         "database_host": default_settings.database_host,
         "database_port": default_settings.database_port,
         "database_name": default_settings.database_name,

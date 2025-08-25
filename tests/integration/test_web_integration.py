@@ -30,7 +30,8 @@ class TestWebInterfaceIntegration(TestCase):
     def test_user_authentication_flow(self):
         """Test complete user authentication workflow."""
         # Test login page
-        login_url = reverse('login') if 'login' in [url.name for url in get_urlpatterns()] else '/login/'
+        url_names = get_url_names()
+        login_url = reverse('login') if 'login' in url_names else '/login/'
         response = self.client.get(login_url)
         self.assertIn(response.status_code, [200, 404])  # 404 if login not implemented yet
         
@@ -63,7 +64,7 @@ class TestWebInterfaceIntegration(TestCase):
         }
         
         # This would need the actual upload endpoint
-        upload_url = '/upload/' if hasattr(self, 'upload_url') else '/'
+        upload_url = '/upload/'
         response = self.client.post(upload_url, upload_data)
         
         # Check response (exact assertion depends on implementation)
@@ -74,7 +75,24 @@ def get_urlpatterns():
     """Helper to get URL patterns safely."""
     try:
         from django.urls import get_resolver
-        return get_resolver().url_patterns
+        patterns = []
+        for pattern in get_resolver().url_patterns:
+            if hasattr(pattern, 'name') and pattern.name:
+                patterns.append(pattern)
+        return patterns
+    except:
+        return []
+
+
+def get_url_names():
+    """Helper to get URL names safely."""
+    try:
+        from django.urls import get_resolver
+        names = []
+        for pattern in get_resolver().url_patterns:
+            if hasattr(pattern, 'name') and pattern.name:
+                names.append(pattern.name)
+        return names
     except:
         return []
 
@@ -147,7 +165,7 @@ class TestAPIIntegration(APITestCase):
             'filters': {'column': 'Age', 'operator': '>', 'value': 25}
         }
         
-        response = self.client.post('/api/query/', query_data)
+        response = self.client.post('/api/query/', query_data, format='json')
         self.assertIn(response.status_code, [200, 400, 404])
     
     def test_api_error_handling(self):

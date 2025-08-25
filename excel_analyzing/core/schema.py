@@ -14,7 +14,7 @@ def detect_schema(data: pd.DataFrame) -> Dict[str, Any]:
     Returns:
         Dictionary containing schema information
     """
-    schema = {
+    schema: Dict[str, Any] = {
         "columns": [],
         "total_rows": len(data),
         "total_columns": len(data.columns),

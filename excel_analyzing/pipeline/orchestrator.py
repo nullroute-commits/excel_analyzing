@@ -10,8 +10,13 @@ from typing import Dict, Generator, List, Optional
 from sqlalchemy.orm import Session
 
 from ..core.config import settings
-from ..models.database import (ColumnModel, ProcessingResultModel, SheetModel,
-                               WorkbookModel, db_manager)
+from ..models.database import (
+    ColumnModel,
+    ProcessingResultModel,
+    SheetModel,
+    WorkbookModel,
+    db_manager,
+)
 from ..models.schemas import ProcessingOptions, ProcessingResult, WorkbookInfo
 from .processor import ExcelDataProcessor
 
