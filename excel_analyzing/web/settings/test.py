@@ -1,7 +1,7 @@
 """Test settings."""
 
-from .base import *  # noqa: F403, F401
 from ...core.config import settings as app_settings
+from .base import *  # noqa: F403, F401
 
 # Test specific settings
 DEBUG = False
@@ -19,8 +19,10 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
 
-# Override SECRET_KEY for security tests  
-SECRET_KEY = "test-secret-key-that-is-definitely-long-enough-for-security-testing-requirements"
+# Override SECRET_KEY for security tests
+SECRET_KEY = (
+    "test-secret-key-that-is-definitely-long-enough-for-security-testing-requirements"
+)
 
 
 # Disable migrations for tests

@@ -1,7 +1,7 @@
 """Development settings."""
 
-from .base import *  # noqa: F403, F401
 from ...core.config import settings as app_settings
+from .base import *  # noqa: F403, F401
 
 # Development specific settings
 DEBUG = True

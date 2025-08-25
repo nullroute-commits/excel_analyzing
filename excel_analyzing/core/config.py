@@ -53,20 +53,32 @@ class Settings(BaseSettings):  # type: ignore
     max_sheets_per_workbook: int = Field(
         default=50, description="Max sheets per workbook"
     )
-    processing_timeout: int = Field(default=300, description="Processing timeout in seconds")
-    max_concurrent_jobs: int = Field(default=4, description="Max concurrent processing jobs")
+    processing_timeout: int = Field(
+        default=300, description="Processing timeout in seconds"
+    )
+    max_concurrent_jobs: int = Field(
+        default=4, description="Max concurrent processing jobs"
+    )
 
     # Django settings
     django_secret_key: str = Field(
-        default="dev-secret-key-change-in-production-this-is-long-enough-for-security-tests", description="Django secret key"
+        default=(
+            "dev-secret-key-change-in-production-"
+            "this-is-long-enough-for-security-tests"
+        ),
+        description="Django secret key",
     )
     allowed_hosts: List[str] = Field(
         default=["web-service", "localhost", "127.0.0.1"], description="Allowed hosts"
     )
 
     # URL settings (hostname-based)
-    api_base_url: str = Field(default="http://web-service:8000/api", description="API base URL")
-    frontend_url: str = Field(default="http://web-service:8000", description="Frontend URL")
+    api_base_url: str = Field(
+        default="http://web-service:8000/api", description="API base URL"
+    )
+    frontend_url: str = Field(
+        default="http://web-service:8000", description="Frontend URL"
+    )
 
     # Logging settings
     log_level: str = Field(default="INFO", description="Log level")
@@ -78,13 +90,19 @@ class Settings(BaseSettings):  # type: ignore
     @property
     def database_url(self) -> str:
         """Construct database URL from hostname-based components."""
-        return f"postgresql://{self.database_user}:{self.database_password}@{self.database_host}:{self.database_port}/{self.database_name}"
+        return (
+            f"postgresql://{self.database_user}:{self.database_password}"
+            f"@{self.database_host}:{self.database_port}/{self.database_name}"
+        )
 
     @property
     def redis_url(self) -> str:
         """Construct Redis URL from hostname-based components."""
         if self.redis_password:
-            return f"redis://:{self.redis_password}@{self.redis_host}:{self.redis_port}/{self.redis_db}"
+            return (
+                f"redis://:{self.redis_password}@{self.redis_host}"
+                f":{self.redis_port}/{self.redis_db}"
+            )
         return f"redis://{self.redis_host}:{self.redis_port}/{self.redis_db}"
 
     @validator("allowed_hosts", pre=True)
@@ -106,10 +124,10 @@ def get_settings() -> Settings:
     """Get application settings instance with environment-specific configuration."""
     # Get current environment
     env = os.getenv("ENVIRONMENT", "development")
-    
+
     # Define base path for environment configurations
     base_path = Path(__file__).parent.parent.parent / "env"
-    
+
     # Load configuration files based on service and environment
     env_files = [
         base_path / "web" / "django" / f".env.{env}",
@@ -117,15 +135,15 @@ def get_settings() -> Settings:
         base_path / "cache" / "redis" / f".env.{env}",
         base_path / "processing" / "core" / f".env.{env}",
     ]
-    
+
     # Add root .env file if it exists
     root_env = base_path.parent / ".env"
     if root_env.exists():
         env_files.append(root_env)
-    
+
     # Filter existing files and convert to strings
     existing_env_files = [str(f) for f in env_files if f.exists()]
-    
+
     # Load environment variables from files
     # Environment files are loaded in the following order:
     #   1. web/django/.env.{env}
@@ -133,10 +151,12 @@ def get_settings() -> Settings:
     #   3. cache/redis/.env.{env}
     #   4. processing/core/.env.{env}
     #   5. root .env (if exists)
-    # Because override=True is used, variables from later files will override those from earlier files.
+    # Because override=True is used, variables from later files will override
+    # those from earlier files.
     # This makes the last file in the list highest precedence.
     for env_file in existing_env_files:
         from dotenv import load_dotenv
+
         load_dotenv(env_file, override=True)
     return Settings()
 
