@@ -61,21 +61,20 @@ class WorkbookUploadView(TemplateView):
     def post(self, request, *args, **kwargs):
         """Handle workbook upload."""
         from django.http import JsonResponse
-        
+
         # Handle file upload
-        if 'file' in request.FILES:
-            file_obj = request.FILES['file']
-            name = request.POST.get('name', file_obj.name)
-            
+        if "file" in request.FILES:
+            file_obj = request.FILES["file"]
+            name = request.POST.get("name", file_obj.name)
+
             # For testing purposes, just return success
-            return JsonResponse({
-                'success': True,
-                'message': 'Workbook uploaded successfully',
-                'file_name': file_obj.name,
-                'name': name
-            })
-        
-        return JsonResponse({
-            'success': False,
-            'error': 'No file provided'
-        }, status=400)
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": "Workbook uploaded successfully",
+                    "file_name": file_obj.name,
+                    "name": name,
+                }
+            )
+
+        return JsonResponse({"success": False, "error": "No file provided"}, status=400)

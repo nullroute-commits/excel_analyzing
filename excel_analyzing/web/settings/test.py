@@ -21,7 +21,8 @@ PASSWORD_HASHERS = [
 
 # Override SECRET_KEY for security tests
 SECRET_KEY = (
-    "test-cryptographic-phrase-that-is-definitely-long-enough-for-secure-testing-requirements"
+    "test-cryptographic-phrase-that-is-definitely-long-enough-for-secure-"
+    "testing-requirements"
 )
 
 
