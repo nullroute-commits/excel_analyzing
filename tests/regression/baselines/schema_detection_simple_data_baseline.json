@@ -8,19 +8,19 @@
       {
         "name": "Name",
         "type": "object",
-        "nullable": false,
+        "nullable": "False",
         "unique_values": 3
       },
       {
         "name": "Age",
         "type": "int64",
-        "nullable": false,
+        "nullable": "False",
         "unique_values": 3
       },
       {
         "name": "Salary",
         "type": "int64",
-        "nullable": false,
+        "nullable": "False",
         "unique_values": 3
       }
     ]

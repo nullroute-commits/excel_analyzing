@@ -1,7 +1,7 @@
 """Test settings."""
 
-from .base import *  # noqa: F403, F401
 from ...core.config import settings as app_settings
+from .base import *  # noqa: F403, F401
 
 # Test specific settings
 DEBUG = False
@@ -19,8 +19,10 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
 
-# Override SECRET_KEY for security tests  
-SECRET_KEY = "test-secret-key-that-is-definitely-long-enough-for-security-testing-requirements"
+# Override SECRET_KEY for security tests
+SECRET_KEY = (
+    "test-secret-key-that-is-definitely-long-enough-for-security-testing-requirements"
+)
 
 
 # Disable migrations for tests
@@ -48,3 +50,24 @@ EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 # Celery (if used)
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
+
+# Test logging - console only to avoid permission issues
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": app_settings.log_format,
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": app_settings.log_level,
+    },
+}

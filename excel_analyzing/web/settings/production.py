@@ -3,8 +3,8 @@
 import os
 from typing import List
 
-from .base import *  # noqa: F403, F401
 from ...core.config import settings as app_settings
+from .base import *  # noqa: F403, F401
 
 # Production specific settings
 DEBUG = False
@@ -30,7 +30,9 @@ LOGGING["handlers"]["file"][  # type: ignore  # noqa: F405
 
 # Email backend with hostname-based configuration
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = os.getenv("EMAIL_HOST", "mail-service")  # Use hostname instead of localhost
+EMAIL_HOST = os.getenv(
+    "EMAIL_HOST", "mail-service"
+)  # Use hostname instead of localhost
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() == "true"
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")

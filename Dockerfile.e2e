@@ -1,15 +1,12 @@
-# Test Dockerfile - Optimized for testing environment
-FROM python:3.12-alpine AS base
+# E2E Test Dockerfile - Debian-based for Playwright compatibility
+FROM mcr.microsoft.com/playwright/python:v1.48.0-jammy AS base
 
 # Install system dependencies
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    libpq-dev \
     gcc \
-    musl-dev \
-    postgresql-dev \
-    libffi-dev \
-    curl \
-    git \
-    && rm -rf /var/cache/apk/*
+    && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -18,16 +15,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     DJANGO_DEBUG=False \
     SETUPTOOLS_SCM_PRETEND_VERSION_FOR_EXCEL_ANALYZING=0.1.0
 
-# Create non-root user
-RUN addgroup -g 1000 excel && \
-    adduser -u 1000 -G excel -s /bin/sh -D excel
-
 # Set work directory
 WORKDIR /app
 
 # Copy requirements and install dependencies
-COPY requirements-dev.txt requirements.txt ./
-RUN pip install --no-cache-dir -r requirements-dev.txt
+COPY requirements.txt requirements-e2e.txt ./
+RUN pip install --no-cache-dir -r requirements-e2e.txt
 
 # Copy project
 COPY . .
@@ -37,10 +30,13 @@ RUN pip install -e .
 
 # Create directories
 RUN mkdir -p /app/logs /app/staticfiles && \
-    chown -R excel:excel /app
+    chown -R pwuser:pwuser /app
+
+# Install Playwright browsers (they're already installed in the base image)
+RUN playwright install chromium
 
 # Switch to non-root user
-USER excel
+USER pwuser
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
@@ -49,5 +45,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 # Expose port
 EXPOSE 8000
 
-# Run tests by default, can be overridden
-CMD ["python", "-m", "pytest", "-v"]
+# Run E2E tests by default
+CMD ["python", "-m", "pytest", "tests/e2e/", "-v", "--headed"]
