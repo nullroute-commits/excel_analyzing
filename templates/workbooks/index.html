@@ -1,0 +1,52 @@
+{% extends "workbooks/base.html" %}
+
+{% block title %}{{ title|default:"Excel Analyzing - Home" }}{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Welcome to Excel Analyzing</h1>
+    <p>A powerful tool for analyzing Excel files and extracting insights from your data.</p>
+    
+    <div class="features">
+        <h2>Features</h2>
+        <ul>
+            <li>Upload and analyze Excel files</li>
+            <li>Automatic data type detection</li>
+            <li>Data cleaning and validation</li>
+            <li>Statistical analysis and insights</li>
+            <li>Export processed data</li>
+        </ul>
+    </div>
+    
+    <div class="actions">
+        <h2>Get Started</h2>
+        <p>
+            <a href="{% url 'workbooks:workbook_upload' %}" 
+               style="background-color: #007acc; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+                Upload Excel File
+            </a>
+        </p>
+        <p>
+            <a href="{% url 'workbooks:workbook_list' %}" 
+               style="background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+                View Existing Workbooks
+            </a>
+        </p>
+    </div>
+</div>
+
+<style>
+.hero {
+    text-align: center;
+    padding: 40px 0;
+}
+.features, .actions {
+    margin: 30px 0;
+    text-align: left;
+}
+.features ul {
+    max-width: 400px;
+    margin: 0 auto;
+}
+</style>
+{% endblock %}

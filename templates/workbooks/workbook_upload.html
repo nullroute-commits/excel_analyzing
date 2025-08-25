@@ -1,0 +1,136 @@
+{% extends "workbooks/base.html" %}
+
+{% block title %}{{ title|default:"Upload Workbook" }}{% endblock %}
+
+{% block content %}
+<div class="upload-form">
+    <h1>Upload Excel Workbook</h1>
+    <p>Upload an Excel file (.xlsx, .xls) to analyze its structure and data.</p>
+    
+    <form method="post" enctype="multipart/form-data" class="upload-form-content">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="file">Select Excel File:</label>
+            <input type="file" 
+                   id="file" 
+                   name="file" 
+                   accept=".xlsx,.xls" 
+                   required
+                   class="file-input">
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description (optional):</label>
+            <textarea id="description" 
+                      name="description" 
+                      rows="3" 
+                      placeholder="Enter a description for this workbook..."
+                      class="form-control"></textarea>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                Upload and Analyze
+            </button>
+            <a href="{% url 'workbooks:workbook_list' %}" class="btn btn-secondary">
+                Cancel
+            </a>
+        </div>
+    </form>
+    
+    <div class="upload-info">
+        <h2>Supported Formats</h2>
+        <ul>
+            <li>Excel 2007+ (.xlsx)</li>
+            <li>Excel 97-2003 (.xls)</li>
+        </ul>
+        
+        <h2>What happens after upload?</h2>
+        <ol>
+            <li>File is uploaded and stored securely</li>
+            <li>Workbook structure is analyzed</li>
+            <li>Sheet and column information is extracted</li>
+            <li>Data types are automatically inferred</li>
+            <li>Statistical summaries are generated</li>
+        </ol>
+    </div>
+</div>
+
+<style>
+.upload-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+.upload-form-content {
+    background-color: #f8f9fa;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    margin: 20px 0;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+.file-input, .form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 16px;
+}
+.form-control {
+    resize: vertical;
+    font-family: inherit;
+}
+.form-actions {
+    text-align: center;
+    margin-top: 30px;
+}
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    margin: 0 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.btn-primary {
+    background-color: #007acc;
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+.btn-secondary:hover {
+    background-color: #545b62;
+}
+.upload-info {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #e9ecef;
+    border-radius: 8px;
+}
+.upload-info h2 {
+    color: #495057;
+    margin-top: 0;
+}
+.upload-info ul, .upload-info ol {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+</style>
+{% endblock %}

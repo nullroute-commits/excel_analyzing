@@ -1,0 +1,128 @@
+{% extends "workbooks/base.html" %}
+
+{% block title %}{{ title|default:"Workbook Details" }}{% endblock %}
+
+{% block content %}
+<div class="workbook-detail">
+    <h1>{{ workbook.file_name }}</h1>
+    
+    <div class="workbook-info">
+        <h2>File Information</h2>
+        <table class="info-table">
+            <tr>
+                <td><strong>File Path:</strong></td>
+                <td>{{ workbook.file_path }}</td>
+            </tr>
+            <tr>
+                <td><strong>File Size:</strong></td>
+                <td>{{ workbook.file_size|default:"Unknown" }} bytes</td>
+            </tr>
+            <tr>
+                <td><strong>Uploaded:</strong></td>
+                <td>{{ workbook.created_at|date:"M d, Y H:i:s" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Last Modified:</strong></td>
+                <td>{{ workbook.updated_at|date:"M d, Y H:i:s" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Processing Status:</strong></td>
+                <td>{{ workbook.processing_status|default:"Pending" }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    {% if workbook.sheets.exists %}
+        <div class="sheets-info">
+            <h2>Sheets ({{ workbook.sheets.count }})</h2>
+            <div class="sheets-list">
+                {% for sheet in workbook.sheets.all %}
+                    <div class="sheet-card">
+                        <h3>{{ sheet.sheet_name }}</h3>
+                        <p><strong>Rows:</strong> {{ sheet.total_rows|default:"Unknown" }}</p>
+                        <p><strong>Columns:</strong> {{ sheet.total_columns|default:"Unknown" }}</p>
+                        <p><strong>Data Start Row:</strong> {{ sheet.data_start_row|default:1 }}</p>
+                        {% if sheet.columns.exists %}
+                            <details>
+                                <summary>Columns ({{ sheet.columns.count }})</summary>
+                                <ul class="columns-list">
+                                    {% for column in sheet.columns.all %}
+                                        <li>
+                                            <strong>{{ column.column_name }}</strong>
+                                            - {{ column.data_type|default:"Unknown" }}
+                                            {% if column.null_count %}
+                                                ({{ column.null_count }} nulls)
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </details>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="no-sheets">
+            <h2>No sheet information available</h2>
+            <p>This workbook may not have been processed yet.</p>
+        </div>
+    {% endif %}
+    
+    <div class="actions">
+        <a href="{% url 'workbooks:workbook_list' %}" 
+           style="background-color: #6c757d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+            Back to Workbooks
+        </a>
+    </div>
+</div>
+
+<style>
+.workbook-detail {
+    max-width: 800px;
+}
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+}
+.info-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+}
+.info-table td:first-child {
+    width: 200px;
+    background-color: #f8f9fa;
+}
+.sheets-list {
+    display: grid;
+    gap: 20px;
+    margin: 20px 0;
+}
+.sheet-card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+.sheet-card h3 {
+    margin-top: 0;
+    color: #007acc;
+}
+.columns-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin: 10px 0;
+    padding-left: 20px;
+}
+.no-sheets {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+.actions {
+    margin-top: 30px;
+    text-align: center;
+}
+</style>
+{% endblock %}
