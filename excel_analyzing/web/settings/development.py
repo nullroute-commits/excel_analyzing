@@ -1,7 +1,7 @@
 """Development settings."""
 
-from .base import *  # noqa: F403, F401
 from ...core.config import settings as app_settings
+from .base import *  # noqa: F403, F401
 
 # Development specific settings
 DEBUG = True
@@ -38,4 +38,25 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "LOCATION": app_settings.redis_url,
     }
+}
+
+# Development logging - console only to avoid permission issues
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": app_settings.log_format,
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": app_settings.log_level,
+    },
 }

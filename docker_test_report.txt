@@ -1,0 +1,142 @@
+time="2025-08-25T05:09:54Z" level=warning msg="/workspaces/excel_analyzing/docker-compose.test.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+Attaching to test-cache-service, test-db-service, test-web-service
+test-cache-service  | 1:C 25 Aug 2025 05:09:55.063 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+test-cache-service  | 1:C 25 Aug 2025 05:09:55.064 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+test-cache-service  | 1:C 25 Aug 2025 05:09:55.064 * Redis version=7.4.5, bits=64, commit=00000000, modified=0, pid=1, just started
+test-cache-service  | 1:C 25 Aug 2025 05:09:55.064 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+test-cache-service  | 1:M 25 Aug 2025 05:09:55.065 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+test-cache-service  | 1:M 25 Aug 2025 05:09:55.065 * monotonic clock: POSIX clock_gettime
+test-cache-service  | 1:M 25 Aug 2025 05:09:55.066 * Running mode=standalone, port=6379.
+test-cache-service  | 1:M 25 Aug 2025 05:09:55.067 * Server initialized
+test-cache-service  | 1:M 25 Aug 2025 05:09:55.068 * Loading RDB produced by version 7.4.5
+test-cache-service  | 1:M 25 Aug 2025 05:09:55.068 * RDB age 26 seconds
+test-cache-service  | 1:M 25 Aug 2025 05:09:55.068 * RDB memory usage when created 0.90 Mb
+test-cache-service  | 1:M 25 Aug 2025 05:09:55.068 * Done loading RDB, keys loaded: 0, keys expired: 0.
+test-cache-service  | 1:M 25 Aug 2025 05:09:55.068 * DB loaded from disk: 0.001 seconds
+test-cache-service  | 1:M 25 Aug 2025 05:09:55.068 * Ready to accept connections tcp
+test-db-service     | 
+test-db-service     | PostgreSQL Database directory appears to contain a database; Skipping initialization
+test-db-service     | 
+test-db-service     | 2025-08-25 05:09:55.227 UTC [1] LOG:  starting PostgreSQL 16.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit
+test-db-service     | 2025-08-25 05:09:55.227 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+test-db-service     | 2025-08-25 05:09:55.227 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+test-db-service     | 2025-08-25 05:09:55.230 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+test-db-service     | 2025-08-25 05:09:55.256 UTC [28] LOG:  database system was shut down at 2025-08-25 05:09:29 UTC
+test-db-service     | 2025-08-25 05:09:55.276 UTC [1] LOG:  database system is ready to accept connections
+test-web-service    | ============================= test session starts ==============================
+test-web-service    | platform linux -- Python 3.12.11, pytest-8.4.1, pluggy-1.6.0 -- /usr/local/bin/python
+test-web-service    | cachedir: .pytest_cache
+test-web-service    | django: version: 5.2.5, settings: excel_analyzing.web.settings.test (from ini)
+test-web-service    | rootdir: /app
+test-web-service    | configfile: pyproject.toml
+test-web-service    | testpaths: tests
+test-web-service    | plugins: Faker-37.5.3, django-4.11.1, cov-6.2.1
+test-web-service    | collecting ... collected 98 items
+test-web-service    | 
+test-web-service    | tests/integration/test_web_integration.py::TestWebInterfaceIntegration::test_home_page_loads FAILED [  1%]
+test-web-service    | tests/integration/test_web_integration.py::TestWebInterfaceIntegration::test_user_authentication_flow FAILED [  2%]
+test-web-service    | tests/integration/test_web_integration.py::TestWebInterfaceIntegration::test_workbook_upload_workflow FAILED [  3%]
+test-web-service    | tests/integration/test_web_integration.py::TestAPIIntegration::test_api_endpoints_accessibility PASSED [  4%]
+test-web-service    | tests/integration/test_web_integration.py::TestAPIIntegration::test_api_error_handling PASSED [  5%]
+test-web-service    | tests/integration/test_web_integration.py::TestAPIIntegration::test_api_permissions PASSED [  6%]
+test-web-service    | tests/integration/test_web_integration.py::TestAPIIntegration::test_data_query_api FAILED [  7%]
+test-web-service    | tests/integration/test_web_integration.py::TestAPIIntegration::test_workbook_api_crud PASSED [  8%]
+test-web-service    | tests/integration/test_web_integration.py::TestEndToEndWorkflow::test_complete_excel_analysis_workflow PASSED [  9%]
+test-web-service    | tests/integration/test_web_integration.py::TestEndToEndWorkflow::test_error_recovery_workflow PASSED [ 10%]
+test-web-service    | tests/integration/test_web_integration.py::TestEndToEndWorkflow::test_multi_user_workflow PASSED [ 11%]
+test-web-service    | tests/security/test_security_suite.py::TestWebSecurityDjango::test_csrf_protection PASSED [ 12%]
+test-web-service    | tests/security/test_security_suite.py::TestWebSecurityDjango::test_security_headers FAILED [ 13%]
+test-web-service    | tests/security/test_security_suite.py::TestWebSecurityDjango::test_sensitive_data_exposure PASSED [ 14%]
+test-web-service    | tests/security/test_security_suite.py::TestWebSecurityDjango::test_sql_injection_prevention PASSED [ 15%]
+test-web-service    | tests/security/test_security_suite.py::TestWebSecurityDjango::test_xss_prevention PASSED [ 16%]
+test-db-service     | 2025-08-25 05:10:01.901 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:01.901 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_end_to_end_workflow0/test_workbook.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-db-service     | 2025-08-25 05:10:01.904 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:01.904 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_end_to_end_workflow0/test_workbook.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-web-service    | tests/integration/test_pipeline_integration.py::TestExcelPipelineIntegration::test_end_to_end_workflow PASSED [ 17%]
+test-db-service     | 2025-08-25 05:10:01.973 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:01.973 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_pipeline_with_custom_opti0/test_workbook.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-db-service     | 2025-08-25 05:10:01.975 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:01.975 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_pipeline_with_custom_opti0/test_workbook.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-web-service    | tests/integration/test_pipeline_integration.py::TestExcelPipelineIntegration::test_pipeline_with_custom_options PASSED [ 18%]
+test-db-service     | 2025-08-25 05:10:02.048 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:02.048 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_complex_data_processing0/complex_workbook.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-db-service     | 2025-08-25 05:10:02.050 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:02.050 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_complex_data_processing0/complex_workbook.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-web-service    | tests/integration/test_pipeline_integration.py::TestExcelPipelineIntegration::test_complex_data_processing PASSED [ 19%]
+test-db-service     | 2025-08-25 05:10:02.107 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:02.107 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_directory_processing0/test_2.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-db-service     | 2025-08-25 05:10:02.109 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:02.109 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_directory_processing0/test_2.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-db-service     | 2025-08-25 05:10:02.128 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:02.128 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_directory_processing0/test_1.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-db-service     | 2025-08-25 05:10:02.131 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:02.131 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_directory_processing0/test_1.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-db-service     | 2025-08-25 05:10:02.155 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:02.155 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_directory_processing0/test_0.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-db-service     | 2025-08-25 05:10:02.157 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:02.157 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_directory_processing0/test_0.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-web-service    | tests/integration/test_pipeline_integration.py::TestExcelPipelineIntegration::test_directory_processing PASSED [ 20%]
+test-web-service    | tests/integration/test_pipeline_integration.py::TestExcelPipelineIntegration::test_error_handling PASSED [ 21%]
+test-db-service     | 2025-08-25 05:10:02.267 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:02.267 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_database_integration0/test_workbook.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-db-service     | 2025-08-25 05:10:02.270 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:02.270 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_database_integration0/test_workbook.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-web-service    | tests/integration/test_pipeline_integration.py::TestExcelPipelineIntegration::test_database_integration PASSED [ 22%]
+test-db-service     | 2025-08-25 05:10:02.330 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:02.330 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_api_integration0/test_workbook.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-db-service     | 2025-08-25 05:10:02.333 UTC [32] ERROR:  relation "workbooks" does not exist at character 331
+test-db-service     | 2025-08-25 05:10:02.333 UTC [32] STATEMENT:  SELECT workbooks.id AS workbooks_id, workbooks.file_path AS workbooks_file_path, workbooks.file_name AS workbooks_file_name, workbooks.file_size_bytes AS workbooks_file_size_bytes, workbooks.sheet_count AS workbooks_sheet_count, workbooks.created_at AS workbooks_created_at, workbooks.processed_at AS workbooks_processed_at 
+test-db-service     | 	FROM workbooks 
+test-db-service     | 	WHERE workbooks.file_path = '/tmp/pytest-of-excel/pytest-1/test_api_integration0/test_workbook.xlsx' 
+test-db-service     | 	 LIMIT 1
+test-web-service    | tests/integration/test_pipeline_integration.py::TestExcelPipelineIntegration::test_api_integration PASSED [ 23%]
+test-web-service    | tests/performance/test_performance_suite.py::TestDataProcessingPerformance::test_small_dataset_performance PASSED [ 24%]
+test-web-service    | tests/performance/test_performance_suite.py::TestDataProcessingPerformance::test_medium_dataset_performance PASSED [ 25%]
+test-web-service    | tests/performance/test_performance_suite.py::TestDataProcessingPerformance::test_large_dataset_performance PASSED [ 26%]
+test-web-service    | tests/performance/test_performance_suite.py::TestDataProcessingPerformance::test_wide_dataset_performance PASSED [ 27%]

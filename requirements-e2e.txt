@@ -1,0 +1,8 @@
+# E2E testing dependencies (Debian-based container only)
+-r requirements.txt
+pytest>=8.4.0
+pytest-cov>=6.2.0
+pytest-django>=4.11.1
+pytest-playwright>=0.7.0
+factory-boy>=3.3.0
+psutil>=6.1.0
