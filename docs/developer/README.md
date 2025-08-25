@@ -1,203 +1,683 @@
 # Developer Guide
 
-# Developer Guide
-
 ## Architecture Overview
 
-Excel Analyzing follows a containerized microservices architecture with clear separation of concerns and hostname-based service communication:
+Excel Analyzing implements a **containerized microservices architecture** designed for scalable Excel workbook processing with modern DevOps practices.
+
+### System Architecture
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Web Service   │◄──►│  Database Svc   │◄──►│   Cache Service │
-│  (web-service)  │    │  (db-service)   │    │ (cache-service) │
-├─────────────────┤    ├─────────────────┤    ├─────────────────┤
-│ Django REST API │    │ PostgreSQL      │    │ Redis Cache     │
-│ Web Interface   │    │ Alpine Based    │    │ Alpine Based    │
-│ Alpine Based    │    └─────────────────┘    └─────────────────┘
-└─────────────────┘
-        │
-        ▼
-┌─────────────────┐    ┌─────────────────┐
-│ Worker Service  │    │ Processing Core │
-│(worker-service) │◄──►│   (Internal)    │
-├─────────────────┤    ├─────────────────┤
-│ Background Jobs │    │ Excel Analysis  │
-│ Alpine Based    │    │ Core Logic      │
-└─────────────────┘    └─────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        Excel Analyzing Platform                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   Client Layer                 API Gateway               Load Balancer      │
+│  ┌─────────────┐    ┌─────────────────┐    ┌─────────────────┐            │
+│  │ Web Browser │◄──►│ Nginx Reverse   │◄──►│ Docker Compose  │            │
+│  │ CLI Tools   │    │ Proxy & SSL     │    │ Load Balancing  │            │
+│  │ API Clients │    │ (Alpine)        │    │ (Multi-replica) │            │
+│  └─────────────┘    └─────────────────┘    └─────────────────┘            │
+│                               │                                             │
+│   Application Services        ▼                                            │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                                                                     │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌──────────┐   │   │
+│  │  │ Web Service │  │Worker Service│  │CLI Interface│  │Processing│   │   │
+│  │  │ (Django)    │  │(Background) │  │  (Click)    │  │  Engine  │   │   │
+│  │  │  REST API   │◄►│  Pipeline   │◄►│Rich Output  │◄►│ (Pandas) │   │   │
+│  │  │  Web UI     │  │ Orchestrator│  │   Async     │  │  Core    │   │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘  └──────────┘   │   │
+│  └─────────────────────────────┬───────────────────────────────────────┘   │
+│                                │                                           │
+│   Persistence & Caching       ▼                                           │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                                                                     │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌──────────┐   │   │
+│  │  │PostgreSQL DB│  │Redis Cache  │  │File Storage │  │Log Store │   │   │
+│  │  │ (Metadata)  │  │(Sessions/   │  │ (Volumes)   │  │(Volumes) │   │   │
+│  │  │ Alpine Base │  │ Task Queue) │  │ Excel Files │  │ App Logs │   │   │
+│  │  │ Persistence │  │Alpine Base  │  │   Static    │  │ Metrics  │   │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘  └──────────┘   │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Service Architecture
+### Service Discovery & Communication
 
-#### Hostname-Based Communication
-All services communicate using hostnames instead of localhost/IP addresses:
-- **Development**: `dev-web-service`, `dev-db-service`, `dev-cache-service`
-- **Test**: `test-web-service`, `test-db-service`, `test-cache-service`  
-- **Production**: `prod-web-service`, `prod-db-service`, `prod-cache-service`
-
-#### Container Strategy
-- **Alpine Base Images**: All containers use Alpine Linux for minimal size
-- **Multistage Builds**: Production containers use multistage builds for better caching
-- **Environment Separation**: Dedicated Dockerfiles for dev, test, and production
-
-### Configuration Management
-
-#### Centralized Environment Structure
-Configuration is organized in `/env/service/subservice/` pattern:
+**Hostname-Based Architecture**: All services communicate using environment-specific hostnames:
 
 ```
-env/
-├── web/django/           # Web service Django settings
-│   ├── .env.development
-│   ├── .env.test
-│   └── .env.production
-├── database/postgresql/  # Database service settings
-│   ├── .env.development
-│   ├── .env.test
-│   └── .env.production
-├── cache/redis/         # Cache service settings
-│   ├── .env.development
-│   ├── .env.test
-│   └── .env.production
-└── processing/core/     # Processing service settings
-    ├── .env.development
-    ├── .env.test
-    └── .env.production
+Service Communication Pattern:
+├── Development Environment
+│   ├── dev-web-service:8000      # Django application
+│   ├── dev-db-service:5432       # PostgreSQL database
+│   ├── dev-cache-service:6379    # Redis cache
+│   └── dev-worker-service        # Background processing
+├── Test Environment
+│   ├── test-web-service:8000     # Test Django instance
+│   ├── test-db-service:5432      # Isolated test database
+│   ├── test-cache-service:6379   # Test cache instance
+│   └── test-worker-service       # Test background jobs
+└── Production Environment
+    ├── prod-web-service:8000     # Production Django
+    ├── prod-db-service:5432      # Production database
+    ├── prod-cache-service:6379   # Production cache
+    ├── prod-worker-service       # Production background jobs
+    └── prod-nginx-service:80/443 # Reverse proxy
 ```
 
-#### Dynamic Configuration Loading
-The application automatically loads environment-specific configurations based on the `ENVIRONMENT` variable:
-- `ENVIRONMENT=development` → loads `.env.development` files
-- `ENVIRONMENT=test` → loads `.env.test` files
-- `ENVIRONMENT=production` → loads `.env.production` files
+### Container Strategy & Technology Stack
 
-### Components
+**Multi-Stage Alpine Containers**:
+```dockerfile
+# Build Strategy
+Base Layer (python:3.12-alpine)
+    ├── System dependencies (gcc, musl-dev, postgresql-dev)
+    ├── Security updates and hardening
+    └── Alpine package manager (apk)
 
-#### Core (`excel_analyzing.core`)
-- **Configuration**: Environment-specific settings using Pydantic
-- **Base classes**: Common functionality and interfaces
+Dependencies Layer
+    ├── Python packages (pandas, django, pydantic)
+    ├── Compiled extensions (psycopg2, numpy)
+    └── Development vs production dependencies
 
-#### Models (`excel_analyzing.models`)
-- **Schemas**: Pydantic data validation models
-- **Database**: SQLAlchemy ORM models for persistence
+Application Layer  
+    ├── Source code integration
+    ├── Static file compilation
+    └── Configuration validation
 
-#### Pipeline (`excel_analyzing.pipeline`)
-- **Processor**: Pandas-based Excel data processing
-- **Orchestrator**: High-level pipeline coordination
+Production Layer
+    ├── Non-root user (excel:excel)
+    ├── Health check implementation
+    ├── Minimal runtime dependencies
+    └── Security hardening
+```
 
-#### Web (`excel_analyzing.web`)
-- **Django**: Web framework setup and configuration
-- **Apps**: Modular Django applications
-- **APIs**: REST endpoints for programmatic access
+### Configuration Management Architecture
 
-#### Utils (`excel_analyzing.utils`)
-- **Logging**: Centralized logging configuration
-- **Files**: File system utilities and helpers
+#### Centralized Environment Configuration
+
+**Sophisticated Configuration System**: The application implements a **hierarchical configuration loading system** with environment-specific overrides:
+
+```
+Configuration Loading Hierarchy (Priority: High → Low):
+├── 1. Environment Variables (OS level)
+│   ├── ENVIRONMENT=development|test|production
+│   ├── DATABASE_HOST=service-hostname  
+│   └── Direct environment overrides
+├── 2. Service-Specific Configuration Files
+│   ├── env/web/django/.env.{environment}
+│   ├── env/database/postgresql/.env.{environment}
+│   ├── env/cache/redis/.env.{environment}
+│   └── env/processing/core/.env.{environment}
+├── 3. Global Configuration
+│   └── .env (root-level overrides)
+└── 4. Application Defaults
+    └── Hardcoded defaults in core/config.py
+```
+
+**Dynamic Configuration Loading Process**:
+```python
+# Automatic environment-based configuration loading
+def get_settings() -> Settings:
+    env = os.getenv("ENVIRONMENT", "development")
+    
+    # Load environment-specific configuration files
+    config_files = [
+        f"env/web/django/.env.{env}",
+        f"env/database/postgresql/.env.{env}", 
+        f"env/cache/redis/.env.{env}",
+        f"env/processing/core/.env.{env}",
+        ".env"  # Root overrides
+    ]
+    
+    # Dynamic hostname generation
+    settings.database_host = f"{env}-db-service"
+    settings.redis_host = f"{env}-cache-service"
+    settings.allowed_hosts = [f"{env}-web-service", "localhost"]
+    
+    return settings
+```
+
+#### Configuration Schema & Validation
+
+**Pydantic-Based Validation**:
+```python
+class Settings(BaseSettings):
+    # Application Configuration
+    app_name: str = "Excel Analyzing"
+    debug: bool = False
+    environment: Environment = Environment.DEVELOPMENT
+    
+    # Service Discovery Configuration
+    database_host: str = "db-service"          # Auto-prefixed with environment
+    database_port: int = 5432
+    redis_host: str = "cache-service"          # Auto-prefixed with environment  
+    redis_port: int = 6379
+    
+    # Processing Configuration
+    max_file_size_mb: int = 100
+    chunk_size: int = 1000
+    max_sheets_per_workbook: int = 50
+    processing_timeout: int = 300
+    max_concurrent_jobs: int = 4
+    
+    # Security Configuration
+    django_secret_key: str = Field(min_length=50)
+    allowed_hosts: List[str] = ["web-service", "localhost"]
+    
+    # Computed Properties
+    @property
+    def database_url(self) -> str:
+        return f"postgresql://{self.database_user}:{self.database_password}@{self.database_host}:{self.database_port}/{self.database_name}"
+```
+
+### Core Components & Technical Implementation
+
+#### Core (`excel_analyzing.core`) - Configuration & Utilities
+```python
+Core Module Architecture:
+├── config.py              # Environment-specific configuration management
+│   ├── Settings class with Pydantic validation
+│   ├── Dynamic hostname generation
+│   ├── Environment-based configuration loading
+│   └── Database/Redis URL construction
+├── data_types.py          # Type definitions and enums
+│   ├── DataType enum (STRING, INTEGER, FLOAT, BOOLEAN, DATETIME, DATE)
+│   ├── Environment enum (DEVELOPMENT, TEST, PRODUCTION)
+│   └── Processing state enums
+├── schema.py              # Schema validation utilities
+│   ├── Excel schema validation
+│   ├── Column schema detection
+│   └── Data integrity checks
+└── cleaning.py            # Data cleaning utilities
+    ├── Column name normalization
+    ├── Data type cleaning
+    └── Null value handling
+```
+
+#### Models (`excel_analyzing.models`) - Data Layer
+```python
+Models Architecture:
+├── schemas.py             # Pydantic validation models
+│   ├── WorkbookInfo       # Workbook metadata validation
+│   ├── SheetInfo          # Sheet structure validation  
+│   ├── ColumnInfo         # Column metadata validation
+│   ├── ProcessingOptions  # Processing configuration
+│   └── ProcessingResult   # Processing outcome validation
+└── database.py            # SQLAlchemy ORM models
+    ├── WorkbookModel       # Database persistence for workbooks
+    ├── SheetModel          # Database persistence for sheets
+    ├── ColumnModel         # Database persistence for columns
+    ├── ProcessingResultModel # Processing results storage
+    └── DatabaseManager     # Connection and session management
+```
+
+#### Pipeline (`excel_analyzing.pipeline`) - Processing Engine
+```python
+Pipeline Architecture:
+├── processor.py           # Core pandas-based Excel processing
+│   ├── ExcelDataProcessor # Main processing class
+│   ├── File format detection (xlsx, xls, xlsm, xlsb)
+│   ├── Header row detection algorithm
+│   ├── Data type inference engine
+│   ├── Column cleaning and normalization
+│   └── Statistical analysis and profiling
+└── orchestrator.py        # High-level pipeline coordination
+    ├── ExcelPipeline      # Main orchestration class
+    ├── File discovery and validation
+    ├── Processing workflow management
+    ├── Database integration and persistence
+    ├── Error handling and recovery
+    └── Progress tracking and reporting
+```
+
+#### Web (`excel_analyzing.web`) - Django Application
+```python
+Web Module Architecture:
+├── apps/
+│   ├── api/               # REST API implementation
+│   │   ├── views.py       # API endpoint implementations
+│   │   ├── urls.py        # URL routing configuration
+│   │   └── serializers.py # Data serialization (future)
+│   ├── workbooks/         # Workbook management interface
+│   │   ├── views.py       # Web interface views
+│   │   ├── models.py      # Django model wrappers
+│   │   ├── management/    # Django management commands
+│   │   └── templates/     # HTML templates
+│   └── __init__.py
+├── settings/              # Environment-specific Django settings
+│   ├── base.py           # Shared Django configuration
+│   ├── development.py    # Development overrides (DEBUG=True)
+│   ├── test.py           # Test environment settings
+│   └── production.py     # Production optimizations
+├── urls.py               # Root URL configuration
+├── wsgi.py               # WSGI application entry point
+└── asgi.py               # ASGI application (future async support)
+```
+
+#### CLI (`excel_analyzing.cli`) - Command Line Interface
+```python
+CLI Architecture:
+├── Rich-based terminal interface with progress bars
+├── Click command group structure:
+│   ├── init-db           # Database initialization
+│   ├── reset-db          # Database reset with confirmation
+│   ├── process           # Batch file processing
+│   ├── analyze           # Single file analysis
+│   ├── list-workbooks    # Database query interface
+│   └── query             # Data querying with pandas syntax
+├── Comprehensive error handling and user feedback
+├── Logging integration with file and console output
+└── Progress tracking for long-running operations
+```
 
 ## Development Setup
 
 ### Prerequisites
-- Python 3.9+
-- Docker & Docker Compose
-- Git
 
-### Environment Configuration
+- **Python 3.10+** (Required - see pyproject.toml for exact version requirements)
+- **Docker & Docker Compose** (Recommended for consistent development environment)
+- **PostgreSQL 12+** (If running locally without Docker)
+- **Redis 6+** (If running locally without Docker)
+- **Git** (For version control and pre-commit hooks)
 
-#### Quick Start with Docker (Recommended)
+### Environment Configuration Options
+
+#### Option 1: Docker Compose Development (Recommended)
+
+**Quick Start**:
 ```bash
-# Clone and setup
+# Clone repository
 git clone https://github.com/nullroute-commits/excel_analyzing.git
 cd excel_analyzing
 
-# Start development environment
+# Start complete development environment
 docker-compose -f docker-compose.dev.yml up -d
 
-# View logs
-docker-compose -f docker-compose.dev.yml logs -f
+# View service logs
+docker-compose -f docker-compose.dev.yml logs -f web-service
+
+# Access development environment
+# Web: http://localhost:8000
+# API: http://localhost:8000/api/
+# Database: localhost:5432 (from host)
 ```
 
-#### Local Development (Alternative)
+**Development Environment Features**:
+- **Hot Reloading**: Code changes automatically reflected
+- **Volume Mounts**: Local code mounted into containers
+- **Debug Mode**: Django debug mode enabled
+- **Service Discovery**: `dev-*-service` hostnames
+- **Isolated Networking**: Services communicate via Docker network
+
+#### Option 2: Local Development Environment
+
+**Setup Process**:
 ```bash
-# Clone and setup
+# Clone and create virtual environment
 git clone https://github.com/nullroute-commits/excel_analyzing.git
 cd excel_analyzing
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Install dependencies
-pip install -r requirements-dev.txt
-pip install -e .
+# Install with development dependencies
+pip install -e ".[dev,test]"
 
-# Set environment
+# Configure environment
 export ENVIRONMENT=development
+export DATABASE_HOST=localhost  # For local PostgreSQL
+export REDIS_HOST=localhost     # For local Redis
 
-# Setup database (requires PostgreSQL running)
+# Setup local database (requires PostgreSQL running)
 createdb excel_analyzing_dev
 excel-analyze init-db
+
+# Start Redis (macOS with Homebrew)
+brew services start redis
+# Or Linux with systemd
+sudo systemctl start redis
 
 # Run development server
 python manage.py runserver 0.0.0.0:8000
 ```
 
-### Environment-Specific Setup
+#### Option 3: Hybrid Development (Docker Services + Local App)
 
-#### Development Environment
-- **Services**: `dev-web-service`, `dev-db-service`, `dev-cache-service`
-- **Configuration**: Loaded from `env/*/development` files
-- **Features**: Debug enabled, local volume mounts, hot reloading
+**Use Case**: When you want to run the application locally but use containerized services:
 
-#### Test Environment  
-- **Services**: `test-web-service`, `test-db-service`, `test-cache-service`
-- **Configuration**: Loaded from `env/*/test` files
-- **Features**: Optimized for testing, isolated test database
-
-#### Production Environment
-- **Services**: `prod-web-service`, `prod-db-service`, `prod-cache-service`
-- **Configuration**: Loaded from `env/*/production` files
-- **Features**: Security hardened, optimized performance, SSL enabled
-
-## Code Standards
-
-### Style Guide
-We follow PEP8 with some modifications:
-- Line length: 88 characters (Black default)
-- String quotes: Double quotes preferred
-- Import sorting: isort with Black profile
-
-### Code Quality Tools
-
-#### Linting
 ```bash
-# Black formatting
+# Start only the services (database, cache)
+docker-compose -f docker-compose.dev.yml up -d db-service cache-service
+
+# Configure local app to use containerized services
+export ENVIRONMENT=development
+export DATABASE_HOST=localhost
+export DATABASE_PORT=5432
+export REDIS_HOST=localhost  
+export REDIS_PORT=6379
+
+# Install and run locally
+pip install -e ".[dev,test]"
+excel-analyze init-db
+python manage.py runserver
+```
+
+### Environment-Specific Development
+
+#### Development Environment Configuration
+- **Services**: `dev-web-service:8000`, `dev-db-service:5432`, `dev-cache-service:6379`
+- **Configuration Files**: `env/*/development/` directory
+- **Features**:
+  - Django DEBUG mode enabled
+  - Hot reloading for code changes
+  - Volume mounts for live development
+  - Verbose logging and error pages
+  - Development-specific database with sample data
+
+#### Test Environment Configuration
+- **Services**: `test-web-service:8000`, `test-db-service:5432`, `test-cache-service:6379`
+- **Configuration Files**: `env/*/test/` directory  
+- **Features**:
+  - Isolated test database (separate from development)
+  - Test-specific configuration optimizations
+  - Faster container startup for CI/CD
+  - Memory-optimized settings for testing
+  - Comprehensive test data fixtures
+
+#### Production Environment Configuration
+- **Services**: `prod-web-service:8000`, `prod-db-service:5432`, `prod-cache-service:6379`, `prod-nginx-service:80/443`
+- **Configuration Files**: `env/*/production/` directory
+- **Features**:
+  - Security hardening (non-root containers, minimal packages)
+  - Performance optimizations (connection pooling, caching)
+  - SSL/HTTPS configuration
+  - Health checks and monitoring
+  - Resource limits and auto-scaling
+
+## Development Workflow
+
+### Code Development Cycle
+
+**1. Feature Development Workflow**:
+```bash
+# Create feature branch
+git checkout -b feature/excel-processing-enhancement
+
+# Start development environment
+docker-compose -f docker-compose.dev.yml up -d
+
+# Make code changes with hot reloading
+# Edit files in excel_analyzing/ directory
+
+# Run tests during development
+pytest tests/unit/ -v
+python run_tests.py --unit --coverage
+
+# Check code quality
 black excel_analyzing/
-
-# Flake8 linting
 flake8 excel_analyzing/
-
-# Import sorting
-isort excel_analyzing/
-
-# Type checking
 mypy excel_analyzing/
+
+# Test API endpoints
+curl -X GET http://localhost:8000/api/workbooks/
+curl -X POST http://localhost:8000/api/workbooks/ -F "file=@test.xlsx"
+
+# Test CLI commands
+excel-analyze process tests/fixtures/ --recursive
+excel-analyze analyze tests/fixtures/sample.xlsx
 ```
 
-#### Pre-commit Hooks
+**2. Testing & Quality Assurance**:
 ```bash
-pre-commit install
-pre-commit run --all-files
-```
-
-#### Testing
-```bash
-# Run all tests
+# Run comprehensive test suite
 python run_tests.py --all
 
 # Run specific test categories
-python run_tests.py --unit --lint
-python run_tests.py --integration --security
-python run_tests.py --performance --regression
+python run_tests.py --unit --integration
+python run_tests.py --security --performance
+python run_tests.py --regression --e2e
 
-# Run with additional options
-python run_tests.py --unit --coverage
+# Run architecture validation
+python test_architecture.py
+
+# Generate coverage reports
+pytest --cov=excel_analyzing --cov-report=html
+open htmlcov/index.html  # View coverage report
+```
+
+**3. Docker Development Workflow**:
+```bash
+# Build development image
+docker build -f Dockerfile.dev -t excel-analyzing:dev .
+
+# Test production build locally
+docker build -t excel-analyzing:prod .
+docker run -d -p 8000:8000 excel-analyzing:prod
+
+# Test multi-environment deployment
+docker-compose -f docker-compose.test.yml up -d
+docker-compose -f docker-compose.yml up -d  # Production
+```
+
+### Database Development
+
+**Database Schema Management**:
+```bash
+# Initialize database
+excel-analyze init-db
+
+# Reset database with confirmation
+excel-analyze reset-db --confirm
+
+# Manual database operations
+from excel_analyzing.models.database import db_manager
+session = next(db_manager.get_session())
+
+# Create custom database queries
+from excel_analyzing.models.database import WorkbookModel, SheetModel
+workbooks = session.query(WorkbookModel).filter_by(file_name='test.xlsx').all()
+```
+
+**Database Migration Strategy** (Future Enhancement):
+```bash
+# Django-style migrations (when implemented)
+python manage.py makemigrations
+python manage.py migrate
+
+# Manual schema updates
+# Direct SQL execution through db_manager
+```
+
+### API Development & Testing
+
+**REST API Development**:
+```python
+# Adding new API endpoints in excel_analyzing/web/apps/api/views.py
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def custom_endpoint(request):
+    # Implementation
+    pass
+
+# URL configuration in excel_analyzing/web/apps/api/urls.py
+urlpatterns = [
+    path('custom/', views.custom_endpoint, name='custom-endpoint'),
+]
+```
+
+**API Testing**:
+```bash
+# Manual API testing
+curl -X GET http://localhost:8000/api/workbooks/ -H "Content-Type: application/json"
+
+# Automated API testing
+pytest tests/integration/test_api.py -v
+
+# Load testing (future enhancement)
+# locust -f tests/performance/locustfile.py --host=http://localhost:8000
+```
+
+### CLI Development
+
+**CLI Command Development**:
+```python
+# Adding new CLI commands in excel_analyzing/cli.py
+@cli.command()
+@click.argument('path', type=click.Path(exists=True))
+@click.option('--option', help='Custom option')
+def new_command(path, option):
+    """New command description."""
+    # Implementation
+    pass
+```
+
+**CLI Testing**:
+```bash
+# Test CLI commands
+excel-analyze --help
+excel-analyze process --help
+excel-analyze analyze tests/fixtures/sample.xlsx
+
+# Test CLI with different environments
+ENVIRONMENT=test excel-analyze process tests/fixtures/
+ENVIRONMENT=production excel-analyze list-workbooks
+```
+
+## Code Standards & Quality
+
+### Code Style Guide
+
+**PEP8 Compliance with Modern Enhancements**:
+- **Line Length**: 88 characters (Black default for better readability)
+- **String Quotes**: Double quotes preferred for consistency
+- **Import Organization**: isort with Black-compatible profile
+- **Type Hints**: Required for public functions and class methods
+- **Docstrings**: Google-style docstrings for all public APIs
+
+### Code Quality Tools & Automation
+
+#### Automated Code Formatting
+```bash
+# Black: Uncompromising Python code formatter
+black excel_analyzing/ tests/
+black --check excel_analyzing/  # Check without modifying
+
+# isort: Import statement organizer
+isort excel_analyzing/ tests/
+isort --check-only excel_analyzing/  # Check without modifying
+
+# Combined formatting
+black excel_analyzing/ && isort excel_analyzing/
+```
+
+#### Code Linting & Analysis
+```bash
+# Flake8: Style guide enforcement
+flake8 excel_analyzing/
+flake8 --statistics excel_analyzing/  # Show error statistics
+
+# mypy: Static type checking
+mypy excel_analyzing/
+mypy --strict excel_analyzing/  # Strict type checking
+
+# Combined linting
+flake8 excel_analyzing/ && mypy excel_analyzing/
+```
+
+#### Pre-commit Hooks Integration
+```bash
+# Install pre-commit hooks (one-time setup)
+pre-commit install
+
+# Run hooks on all files
+pre-commit run --all-files
+
+# Update hook versions
+pre-commit autoupdate
+
+# Pre-commit configuration (.pre-commit-config.yaml):
+# - Black formatting
+# - isort import sorting  
+# - Flake8 linting
+# - mypy type checking
+# - Security scanning with bandit
+```
+
+#### Testing & Coverage
+```bash
+# Unit tests with pytest
+pytest tests/unit/ -v
+pytest tests/unit/ --tb=short  # Shorter traceback format
+
+# Integration tests
+pytest tests/integration/ -v
+
+# Coverage analysis
+pytest --cov=excel_analyzing --cov-report=html
+pytest --cov=excel_analyzing --cov-report=term-missing
+
+# Performance testing
+pytest tests/performance/ -v --benchmark-only
+
+# Security testing
+pytest tests/security/ -v
+
+# Comprehensive test runner
+python run_tests.py --all --coverage
+python run_tests.py --unit --integration --lint
+```
+
+### Development Tools Configuration
+
+#### IDE/Editor Configuration
+
+**VS Code Settings** (`.vscode/settings.json`):
+```json
+{
+    "python.defaultInterpreterPath": "./venv/bin/python",
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.formatting.provider": "black",
+    "python.sortImports.args": ["--profile", "black"],
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    }
+}
+```
+
+**PyCharm Configuration**:
+- Black integration for formatting
+- isort for import organization
+- Flake8 and mypy as external tools
+- Django integration for web development
+- Docker Compose integration
+
+#### Git Hooks & Version Control
+
+**Git Configuration**:
+```bash
+# Setup git hooks
+git config core.hooksPath .githooks
+
+# Conventional commit messages
+git commit -m "feat: add Excel type inference engine"
+git commit -m "fix: resolve database connection timeout"
+git commit -m "docs: update API documentation"
+git commit -m "test: add unit tests for data processor"
+```
+
+**Branch Naming Conventions**:
+- `feature/description` - New features
+- `bugfix/description` - Bug fixes
+- `hotfix/description` - Critical production fixes
+- `docs/description` - Documentation updates
+- `refactor/description` - Code refactoring
+- `test/description` - Test additions/improvements
 python run_tests.py --e2e --headed --video
 
 # Using pytest directly
