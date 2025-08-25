@@ -1,0 +1,11 @@
+{
+  "test_name": "data_type_inference_simple_data",
+  "input_data": {},
+  "expected_output": {
+    "Name": "string",
+    "Age": "integer",
+    "Salary": "integer"
+  },
+  "output_hash": "78b940658f0b81ac6c2f2cd17019b7de",
+  "version": "1.0.0"
+}

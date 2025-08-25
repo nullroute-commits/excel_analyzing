@@ -1,0 +1,14 @@
+{
+  "test_name": "default_processing_options",
+  "input_data": {},
+  "expected_output": {
+    "drop_empty_rows": true,
+    "drop_empty_columns": true,
+    "infer_data_types": true,
+    "clean_column_names": true,
+    "max_sample_size": 100,
+    "null_threshold": 0.9
+  },
+  "output_hash": "f023d163326deca53f79dfbe5e16a02f",
+  "version": "1.0.0"
+}

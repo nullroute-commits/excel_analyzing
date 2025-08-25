@@ -1,0 +1,30 @@
+{
+  "test_name": "data_cleaning_mixed_types",
+  "input_data": {},
+  "expected_output": {
+    "shape": [
+      3,
+      4
+    ],
+    "columns": [
+      "ID",
+      "Text",
+      "Float",
+      "Bool"
+    ],
+    "dtypes": {
+      "ID": "int64",
+      "Text": "object",
+      "Float": "float64",
+      "Bool": "bool"
+    },
+    "null_counts": {
+      "ID": 0,
+      "Text": 0,
+      "Float": 0,
+      "Bool": 0
+    }
+  },
+  "output_hash": "e1bcc42631acebfd00650d85097531c7",
+  "version": "1.0.0"
+}

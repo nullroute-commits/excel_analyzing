@@ -1,0 +1,30 @@
+{
+  "test_name": "schema_detection_simple_data",
+  "input_data": {},
+  "expected_output": {
+    "total_rows": 3,
+    "total_columns": 3,
+    "columns": [
+      {
+        "name": "Name",
+        "type": "object",
+        "nullable": "False",
+        "unique_values": 3
+      },
+      {
+        "name": "Age",
+        "type": "int64",
+        "nullable": "False",
+        "unique_values": 3
+      },
+      {
+        "name": "Salary",
+        "type": "int64",
+        "nullable": "False",
+        "unique_values": 3
+      }
+    ]
+  },
+  "output_hash": "aa43e737ec5834cbf67c936f4a8a805c",
+  "version": "1.0.0"
+}

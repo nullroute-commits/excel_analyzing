@@ -1,0 +1,36 @@
+{
+  "test_name": "schema_detection_mixed_types",
+  "input_data": {},
+  "expected_output": {
+    "total_rows": 3,
+    "total_columns": 4,
+    "columns": [
+      {
+        "name": "ID",
+        "type": "int64",
+        "nullable": "False",
+        "unique_values": 3
+      },
+      {
+        "name": "Text",
+        "type": "object",
+        "nullable": "False",
+        "unique_values": 3
+      },
+      {
+        "name": "Float",
+        "type": "float64",
+        "nullable": "False",
+        "unique_values": 3
+      },
+      {
+        "name": "Bool",
+        "type": "bool",
+        "nullable": "False",
+        "unique_values": 2
+      }
+    ]
+  },
+  "output_hash": "6db36b4505da615df61b275eb1fa7b47",
+  "version": "1.0.0"
+}
