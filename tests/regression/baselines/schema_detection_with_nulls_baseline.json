@@ -1,0 +1,30 @@
+{
+  "test_name": "schema_detection_with_nulls",
+  "input_data": {},
+  "expected_output": {
+    "total_rows": 3,
+    "total_columns": 3,
+    "columns": [
+      {
+        "name": "Col1",
+        "type": "object",
+        "nullable": "True",
+        "unique_values": 2
+      },
+      {
+        "name": "Col2",
+        "type": "float64",
+        "nullable": "True",
+        "unique_values": 2
+      },
+      {
+        "name": "Col3",
+        "type": "float64",
+        "nullable": "True",
+        "unique_values": 2
+      }
+    ]
+  },
+  "output_hash": "d0e8a7423545c97599dcc4044406b3b9",
+  "version": "1.0.0"
+}
