@@ -12,7 +12,8 @@ import json
 @pytest.fixture(scope="session")
 def browser_context(playwright: Playwright):
     """Create a browser context for E2E tests."""
-    browser = playwright.chromium.launch(headless=True)
+    browser = playwright.chromium.launch(head    def test_authentication_required(self, page: Page, base_url):
+        """Test that authentication is required for protected pages."""ss=True)
     context = browser.new_context(
         viewport={'width': 1280, 'height': 720},
         record_video_dir="test-results/videos/"
@@ -28,6 +29,13 @@ def page(browser_context: BrowserContext):
     page = browser_context.new_page()
     yield page
     page.close()
+
+
+@pytest.fixture
+def base_url():
+    """Get the base URL for E2E tests."""
+    import os
+    return os.getenv("BASE_URL", "http://test-web-service:8000")
 
 
 class TestCompleteWorkflow:
@@ -60,9 +68,8 @@ class TestCompleteWorkflow:
             
             return tmp.name
     
-    def test_user_registration_and_login(self, page: Page):
-        """Test user registration and login flow."""
-        base_url = "http://localhost:8000"
+    def test_user_registration_and_login(self, page: Page, test_excel_file, base_url):
+        """Test user registration and login workflow."""
         
         # Navigate to registration page
         page.goto(f"{base_url}/register/")
@@ -88,9 +95,9 @@ class TestCompleteWorkflow:
         page.wait_for_url(f"{base_url}/dashboard/")
         assert "Dashboard" in page.title()
     
-    def test_excel_upload_and_processing(self, page: Page, test_excel_file):
+    def test_excel_upload_and_processing(self, page: Page, test_excel_file, base_url):
         """Test the complete Excel upload and processing workflow."""
-        base_url = "http://localhost:8000"
+        
         
         # Login first (assuming login functionality works)
         page.goto(f"{base_url}/login/")
@@ -121,9 +128,9 @@ class TestCompleteWorkflow:
         # Verify workbook appears in list
         assert "Test Workbook E2E" in page.text_content('body')
     
-    def test_data_exploration_workflow(self, page: Page):
-        """Test data exploration and analysis workflow."""
-        base_url = "http://localhost:8000"
+    def test_data_exploration_workflow(self, page: Page, base_url):
+        """Test data exploration features."""
+        
         
         # Assume we're logged in and have uploaded data
         page.goto(f"{base_url}/workbooks/")
@@ -150,9 +157,9 @@ class TestCompleteWorkflow:
         assert "Widget A" in page.text_content('body')
         assert "1000.00" in page.text_content('body')
     
-    def test_data_filtering_and_search(self, page: Page):
+    def test_data_filtering_and_search(self, page: Page, base_url):
         """Test data filtering and search functionality."""
-        base_url = "http://localhost:8000"
+        
         
         # Navigate to employees sheet
         page.goto(f"{base_url}/workbooks/1/sheets/employees/")
@@ -178,9 +185,9 @@ class TestCompleteWorkflow:
         assert "Charlie Brown" in page.text_content('.filtered-results')
         assert "Bob Smith" not in page.text_content('.filtered-results')
     
-    def test_data_export_workflow(self, page: Page):
+    def test_data_export_workflow(self, page: Page, base_url):
         """Test data export functionality."""
-        base_url = "http://localhost:8000"
+        
         
         # Navigate to workbook
         page.goto(f"{base_url}/workbooks/1/")
@@ -207,9 +214,9 @@ class TestCompleteWorkflow:
         assert download_path.exists()
         assert download_path.stat().st_size > 0
     
-    def test_api_integration_workflow(self, page: Page):
-        """Test API integration through web interface."""
-        base_url = "http://localhost:8000"
+    def test_api_integration_workflow(self, page: Page, base_url):
+        """Test API integration and documentation."""
+        
         
         # Navigate to API explorer/documentation
         page.goto(f"{base_url}/api/docs/")
@@ -229,9 +236,9 @@ class TestCompleteWorkflow:
         assert "Alice Johnson" in response_text
         assert "Charlie Brown" in response_text
     
-    def test_error_handling_workflow(self, page: Page):
-        """Test error handling in the user interface."""
-        base_url = "http://localhost:8000"
+    def test_error_handling_workflow(self, page: Page, base_url):
+        """Test error handling and validation."""
+        
         
         # Test with invalid file upload
         page.goto(f"{base_url}/upload/")
@@ -252,9 +259,9 @@ class TestCompleteWorkflow:
         # Test with network error simulation
         # This would require mocking or service interruption
     
-    def test_performance_user_experience(self, page: Page):
-        """Test performance aspects of user experience."""
-        base_url = "http://localhost:8000"
+    def test_performance_user_experience(self, page: Page, base_url):
+        """Test performance and user experience metrics."""
+        
         
         # Measure page load times
         start_time = time.time()
@@ -283,7 +290,7 @@ class TestCompleteWorkflow:
         mobile_page = browser_context.new_page()
         mobile_page.set_viewport_size({"width": 375, "height": 667})  # iPhone size
         
-        base_url = "http://localhost:8000"
+        
         mobile_page.goto(base_url)
         
         # Check that mobile navigation works
@@ -300,9 +307,9 @@ class TestCompleteWorkflow:
         
         mobile_page.close()
     
-    def test_accessibility_compliance(self, page: Page):
+    def test_accessibility_compliance(self, page: Page, base_url):
         """Test accessibility compliance."""
-        base_url = "http://localhost:8000"
+        
         page.goto(base_url)
         
         # Check for proper heading structure
@@ -326,7 +333,7 @@ class TestCompleteWorkflow:
     def test_cross_browser_compatibility(self, playwright: Playwright):
         """Test cross-browser compatibility."""
         browsers = ['chromium', 'firefox', 'webkit']
-        base_url = "http://localhost:8000"
+        
         
         for browser_name in browsers:
             browser = getattr(playwright, browser_name).launch()
@@ -355,9 +362,9 @@ class TestCompleteWorkflow:
 class TestSecurityE2E:
     """End-to-end security tests."""
     
-    def test_xss_protection(self, page: Page):
+    def test_xss_protection(self, page: Page, base_url):
         """Test XSS protection in the web interface."""
-        base_url = "http://localhost:8000"
+        
         
         # Try to inject XSS in workbook name
         page.goto(f"{base_url}/upload/")
@@ -375,9 +382,9 @@ class TestSecurityE2E:
         assert '<script>' not in page_content
         assert '&lt;script&gt;' in page_content or xss_payload not in page_content
     
-    def test_csrf_protection(self, page: Page):
+    def test_csrf_protection(self, page: Page, base_url):
         """Test CSRF protection."""
-        base_url = "http://localhost:8000"
+        
         
         # Login first
         page.goto(f"{base_url}/login/")
@@ -399,7 +406,7 @@ class TestSecurityE2E:
     
     def test_authentication_required(self, page: Page):
         """Test that authentication is required for protected resources."""
-        base_url = "http://localhost:8000"
+        
         
         # Try to access protected resource without login
         page.goto(f"{base_url}/workbooks/")
@@ -412,7 +419,7 @@ class TestSecurityE2E:
 class TestPerformanceE2E:
     """End-to-end performance tests."""
     
-    def test_large_file_upload_performance(self, page: Page):
+    def test_large_file_upload_performance(self, page: Page, base_url):
         """Test performance with large file uploads."""
         # Create a large test file
         large_data = pd.DataFrame({
@@ -422,7 +429,7 @@ class TestPerformanceE2E:
         with tempfile.NamedTemporaryFile(suffix='.xlsx', delete=False) as tmp:
             large_data.to_excel(tmp.name, index=False)
             
-            base_url = "http://localhost:8000"
+            
             page.goto(f"{base_url}/upload/")
             
             # Measure upload time
@@ -437,7 +444,7 @@ class TestPerformanceE2E:
     
     def test_concurrent_user_performance(self, playwright: Playwright):
         """Test performance with concurrent users."""
-        base_url = "http://localhost:8000"
+        
         concurrent_users = 5
         
         # Create multiple browser contexts to simulate concurrent users
