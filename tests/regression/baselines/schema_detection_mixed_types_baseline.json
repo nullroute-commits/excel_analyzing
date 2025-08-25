@@ -8,25 +8,25 @@
       {
         "name": "ID",
         "type": "int64",
-        "nullable": "False",
+        "nullable": false,
         "unique_values": 3
       },
       {
         "name": "Text",
         "type": "object",
-        "nullable": "False",
+        "nullable": false,
         "unique_values": 3
       },
       {
         "name": "Float",
         "type": "float64",
-        "nullable": "False",
+        "nullable": false,
         "unique_values": 3
       },
       {
         "name": "Bool",
         "type": "bool",
-        "nullable": "False",
+        "nullable": false,
         "unique_values": 2
       }
     ]
