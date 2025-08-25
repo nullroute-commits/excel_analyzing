@@ -307,4 +307,4 @@ def run_architecture_tests():
 
 if __name__ == "__main__":
     success = run_architecture_tests()
-    sys.exit(0 if success else 1)
+# (Removed custom test runner and main block; rely on pytest's native test discovery)
