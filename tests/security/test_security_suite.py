@@ -29,7 +29,7 @@ class TestInputSanitization:
                 tmp.flush()
                 
                 # Test that the system rejects or safely handles malicious files
-                with pytest.raises((ValueError, IOError, SecurityError)) as exc_info:
+                with pytest.raises((ValueError, IOError, Exception)) as exc_info:
                     # This would call the file processing function
                     # process_uploaded_file(tmp.name, filename)
                     pass
@@ -310,7 +310,7 @@ class TestConfigurationSecurity:
         from django.conf import settings
         
         # Secret key should be long and random
-        self.assertGreater(len(settings.SECRET_KEY), 40)
+        assert len(settings.SECRET_KEY) > 40, f"Secret key too short: {len(settings.SECRET_KEY)} characters"
         
         # Secret key should not be a common/default value
         default_keys = [

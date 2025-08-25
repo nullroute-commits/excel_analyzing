@@ -25,7 +25,7 @@ class PerformanceMetrics:
 class PerformanceTestBase:
     """Base class for performance tests."""
     
-    def setUp(self):
+    def setup_method(self):
         """Set up performance testing environment."""
         self.process = psutil.Process(os.getpid())
         self.baseline_memory = self.process.memory_info().rss
@@ -89,8 +89,8 @@ class PerformanceTestBase:
 class TestDataProcessingPerformance(PerformanceTestBase):
     """Performance tests for data processing operations."""
     
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
+        super().setup_method()
     
     @pytest.mark.performance
     def test_small_dataset_performance(self):
@@ -163,8 +163,8 @@ class TestDataProcessingPerformance(PerformanceTestBase):
 class TestExcelFilePerformance(PerformanceTestBase):
     """Performance tests for Excel file operations."""
     
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
+        super().setup_method()
     
     @pytest.mark.performance
     def test_excel_reading_performance(self):
@@ -240,8 +240,8 @@ class TestExcelFilePerformance(PerformanceTestBase):
 class TestDatabasePerformance(PerformanceTestBase):
     """Performance tests for database operations."""
     
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
+        super().setup_method()
     
     @pytest.mark.performance
     def test_bulk_insert_performance(self):
@@ -291,8 +291,8 @@ class TestDatabasePerformance(PerformanceTestBase):
 class TestAPIPerformance(PerformanceTestBase):
     """Performance tests for API endpoints."""
     
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
+        super().setup_method()
     
     @pytest.mark.performance
     def test_api_response_time(self):
@@ -348,8 +348,8 @@ class TestAPIPerformance(PerformanceTestBase):
 class TestMemoryPerformance(PerformanceTestBase):
     """Memory-specific performance tests."""
     
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
+        super().setup_method()
     
     @pytest.mark.performance
     def test_memory_leak_detection(self):
@@ -393,8 +393,8 @@ class TestMemoryPerformance(PerformanceTestBase):
 class TestScalabilityPerformance(PerformanceTestBase):
     """Scalability performance tests."""
     
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
+        super().setup_method()
     
     @pytest.mark.performance
     def test_linear_scalability(self):
