@@ -1,7 +1,10 @@
 version: '3.8'
 
 services:
-  web-service:
+  db-service:
+    image: postgres:16-alpine
+    container_name: dev-db-service
+    hostname: dev-db-serviceervice
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -28,7 +31,7 @@ services:
       - excel-dev-network
 
   db-service:
-    image: postgres:13-alpine
+    image: postgres:16-alpine
     container_name: dev-db-service
     hostname: dev-db-service
     env_file:
@@ -42,7 +45,7 @@ services:
       - excel-dev-network
 
   cache-service:
-    image: redis:7-alpine
+    image: redis:7.4-alpine
     container_name: dev-cache-service
     hostname: dev-cache-service
     env_file:
