@@ -50,7 +50,7 @@ services:
       - excel-network
 
   nginx-service:
-    image: nginx:1.27-alpine
+    image: nginx:alpine
     container_name: prod-nginx-service
     hostname: prod-nginx-service
     ports:
