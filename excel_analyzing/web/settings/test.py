@@ -21,7 +21,7 @@ PASSWORD_HASHERS = [
 
 # Override SECRET_KEY for security tests
 SECRET_KEY = (
-    "test-secret-key-that-is-definitely-long-enough-for-security-testing-requirements"
+    "test-django-application-that-is-definitely-long-enough-for-testing-requirements-abcd1234"
 )
 
 
