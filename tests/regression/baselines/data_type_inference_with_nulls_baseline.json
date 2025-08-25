@@ -1,0 +1,11 @@
+{
+  "test_name": "data_type_inference_with_nulls",
+  "input_data": {},
+  "expected_output": {
+    "Col1": "string",
+    "Col2": "float",
+    "Col3": "float"
+  },
+  "output_hash": "b33d2a7b26ab5c0056ef5226a65731de",
+  "version": "1.0.0"
+}

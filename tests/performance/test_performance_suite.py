@@ -68,6 +68,19 @@ class PerformanceTestBase:
         """Create a test DataFrame with specified dimensions."""
         data = {}
         for i in range(cols):
+            if i % 3 == 0:  # Integer column
+                data[f'int_col_{i}'] = list(range(rows))
+            elif i % 3 == 1:  # Float column
+                data[f'float_col_{i}'] = [j * 1.1 for j in range(rows)]
+            else:  # Boolean column (converted to int for math operations)
+                data[f'bool_col_{i}'] = [int(j % 2 == 0) for j in range(rows)]
+        
+        return pd.DataFrame(data)
+    
+    def create_mixed_dataframe(self, rows: int, cols: int) -> pd.DataFrame:
+        """Create a test DataFrame with mixed data types."""
+        data = {}
+        for i in range(cols):
             if i % 4 == 0:  # Integer column
                 data[f'int_col_{i}'] = list(range(rows))
             elif i % 4 == 1:  # Float column
@@ -115,7 +128,7 @@ class TestDataProcessingPerformance(PerformanceTestBase):
         def process_medium_dataset():
             # Simulate typical processing operations
             cleaned = df.dropna()
-            grouped = cleaned.groupby(cleaned.columns[0]).mean()
+            grouped = cleaned.groupby(cleaned.columns[0]).mean(numeric_only=True)
             return grouped
         
         metrics = self.measure_performance(process_medium_dataset)
@@ -150,7 +163,7 @@ class TestDataProcessingPerformance(PerformanceTestBase):
         
         def process_wide_dataset():
             # Operations that scale with column count
-            correlations = df.corr()
+            correlations = df.corr(numeric_only=True)
             return correlations
         
         metrics = self.measure_performance(process_wide_dataset)
@@ -253,13 +266,17 @@ class TestDatabasePerformance(PerformanceTestBase):
         
         def simulate_bulk_insert():
             # Simulate bulk insert operations
-            batches = []
+            total_rows = 0
             batch_size = 1000
             for i in range(0, len(data), batch_size):
                 batch = data.iloc[i:i+batch_size]
                 # In real implementation: batch.to_sql(...)
-                batches.append(batch)
-            return batches
+                total_rows += len(batch)
+            # Return a simple object with shape attribute for metric calculation
+            class Result:
+                def __init__(self, rows):
+                    self.shape = (rows,)
+            return Result(total_rows)
         
         metrics = self.measure_performance(simulate_bulk_insert)
         
@@ -359,7 +376,7 @@ class TestMemoryPerformance(PerformanceTestBase):
         # Perform the same operation multiple times
         for i in range(100):
             df = self.create_test_dataframe(1000, 10)
-            processed = df.groupby(df.columns[0]).mean()
+            processed = df.groupby(df.columns[0]).mean(numeric_only=True)
             del df, processed  # Explicit cleanup
         
         final_memory = self.process.memory_info().rss

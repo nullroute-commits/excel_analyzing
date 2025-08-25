@@ -1,0 +1,12 @@
+{
+  "test_name": "data_type_inference_mixed_types",
+  "input_data": {},
+  "expected_output": {
+    "ID": "integer",
+    "Text": "string",
+    "Float": "float",
+    "Bool": "float"
+  },
+  "output_hash": "efe7279c045fdeb500c0e628ac751dff",
+  "version": "1.0.0"
+}

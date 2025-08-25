@@ -1,0 +1,27 @@
+{
+  "test_name": "data_cleaning_simple_data",
+  "input_data": {},
+  "expected_output": {
+    "shape": [
+      3,
+      3
+    ],
+    "columns": [
+      "Name",
+      "Age",
+      "Salary"
+    ],
+    "dtypes": {
+      "Name": "object",
+      "Age": "int64",
+      "Salary": "int64"
+    },
+    "null_counts": {
+      "Name": 0,
+      "Age": 0,
+      "Salary": 0
+    }
+  },
+  "output_hash": "18604d5040e94264e49855a21ba29a63",
+  "version": "1.0.0"
+}

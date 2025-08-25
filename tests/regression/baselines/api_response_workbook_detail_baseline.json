@@ -1,0 +1,13 @@
+{
+  "test_name": "api_response_workbook_detail",
+  "input_data": {},
+  "expected_output": {
+    "id": 1,
+    "name": "Test Workbook",
+    "created_at": "2023-01-01T00:00:00Z",
+    "updated_at": "2023-01-01T00:00:00Z",
+    "sheets": []
+  },
+  "output_hash": "8a48dcceb309104852a0ebfbe9d69e49",
+  "version": "1.0.0"
+}
