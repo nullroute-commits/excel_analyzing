@@ -255,7 +255,9 @@ class TestSecurityConfiguration:
         
         # Skip test if using environment variable placeholder (production)
         if settings.django_secret_key.startswith("${") or not settings.django_secret_key:
-            pytest.skip("Production using environment variable placeholder")
+        # Skip test if in production and secret key is not set (i.e., expected to be provided via env var)
+        if settings.environment == Environment.PRODUCTION and not settings.django_secret_key:
+            pytest.skip("Production: secret key expected to be set via environment variable")
             
         # Secret key should be long enough for security
         assert len(settings.django_secret_key) >= 50, "Django secret key should be at least 50 characters"
