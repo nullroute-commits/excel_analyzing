@@ -48,3 +48,24 @@ EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 # Celery (if used)
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
+
+# Test logging - console only to avoid permission issues
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": app_settings.log_format,
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": app_settings.log_level,
+    },
+}

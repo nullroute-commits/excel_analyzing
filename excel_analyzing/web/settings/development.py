@@ -39,3 +39,24 @@ CACHES = {
         "LOCATION": app_settings.redis_url,
     }
 }
+
+# Development logging - console only to avoid permission issues
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": app_settings.log_format,
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": app_settings.log_level,
+    },
+}
