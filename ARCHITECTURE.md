@@ -214,13 +214,15 @@ processing_results (
 );
 ```
 
-#### 4. Cache Service (Redis)
-**Technology Stack**: Redis 7.4 on Alpine Linux
+#### 4. Cache Service (Database-based)
+**Technology Stack**: PostgreSQL Database Cache (NIST Approved)
 **Use Cases**:
-- **Session Storage**: Django session management
-- **Query Caching**: Frequently accessed data
-- **Task Queue**: Background job management (future Celery integration)
-- **Rate Limiting**: API request throttling
+- **Session Storage**: Django session management via database
+- **Query Caching**: Frequently accessed data cached in database
+- **Task Queue**: Background job management (future Celery integration with PostgreSQL broker)
+- **Rate Limiting**: API request throttling via database cache
+
+**NIST Compliance**: Uses only NIST-approved components (PostgreSQL, Django) for enhanced security and compliance.
 
 #### 5. Reverse Proxy (Nginx)
 **Technology Stack**: Nginx on Alpine Linux
@@ -485,10 +487,9 @@ def database_url(self) -> str:
         f"{self.database_host}:{self.database_port}/{self.database_name}"
     )
 
-# Redis URL construction  
-def redis_url(self) -> str:
-    auth = f":{self.redis_password}@" if self.redis_password else ""
-    return f"redis://{auth}{self.redis_host}:{self.redis_port}/{self.redis_db}"
+# Cache URL construction  
+def cache_url(self) -> str:
+    return f"{self.cache_backend}://{self.cache_location}"
 
 # API endpoint construction
 def api_base_url(self) -> str:
@@ -501,7 +502,7 @@ def api_base_url(self) -> str:
 Health Check URLs:
 ├── Web Service: http://{web-service}:8000/health/
 ├── Database: postgresql://{db-service}:5432/health
-└── Cache: redis://{cache-service}:6379/ping
+└── Cache: Database-backed (PostgreSQL)
 ```
 
 ### Inter-Service Communication
@@ -515,10 +516,10 @@ Web Service ←→ Database Service
     └── Query optimization
 
 Web Service ←→ Cache Service  
-    ├── Session management
-    ├── Query result caching
-    ├── Rate limiting
-    └── Temporary data storage
+    ├── Session management (database-backed)
+    ├── Query result caching (database cache)
+    ├── Rate limiting (database-backed)
+    └── Temporary data storage (PostgreSQL)
 
 Web Service ←→ Worker Service
     ├── Task queue communication
@@ -697,10 +698,10 @@ Scaling Architecture:
 │   ├── Query optimization and indexing
 │   └── Backup and recovery procedures
 └── Cache Scaling
-    ├── Redis cluster for high availability
-    ├── Cache partitioning strategies
-    ├── Memory optimization
-    └── Eviction policy configuration
+    ├── Database-backed cache for NIST compliance
+    ├── Cache table partitioning strategies
+    ├── PostgreSQL memory optimization
+    └── Database cache policy configuration
 ```
 
 ### Development vs Production Containers

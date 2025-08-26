@@ -32,11 +32,15 @@ CSRF_TRUSTED_ORIGINS = [
 # Email backend for development
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-# Cache using hostname-based configuration
+# Cache using database backend for NIST compliance
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": app_settings.redis_url,
+        "BACKEND": app_settings.cache_backend,
+        "LOCATION": app_settings.cache_location,
+        "TIMEOUT": app_settings.cache_timeout,
+        "OPTIONS": {
+            "MAX_ENTRIES": 1000,
+        }
     }
 }
 

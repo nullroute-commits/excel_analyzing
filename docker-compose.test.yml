@@ -15,10 +15,8 @@ services:
     environment:
       - ENVIRONMENT=test
       - DATABASE_HOST=test-db-service
-      - REDIS_HOST=test-cache-service
     depends_on:
       - db-service
-      - cache-service
     volumes:
       - .:/app
       - ./test_data:/app/test_data
@@ -38,13 +36,11 @@ services:
     environment:
       - ENVIRONMENT=test
       - DATABASE_HOST=test-db-service
-      - REDIS_HOST=test-cache-service
       - WEB_SERVICE_URL=http://test-web-service:8000
       - BASE_URL=http://test-web-service:8000
     depends_on:
       - web-service
       - db-service
-      - cache-service
     volumes:
       - .:/app
       - ./test_data:/app/test_data
@@ -63,14 +59,7 @@ services:
     networks:
       - excel-test-network
 
-  cache-service:
-    image: redis:7.4-alpine
-    container_name: test-cache-service
-    hostname: test-cache-service
-    env_file:
-      - ./env/cache/redis/.env.test
-    networks:
-      - excel-test-network
+
 
 networks:
   excel-test-network:

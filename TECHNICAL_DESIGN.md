@@ -27,7 +27,7 @@ This document provides a comprehensive technical design overview of the Excel An
 | **Django 5.2+** | Web Framework | Mature, secure, extensive ecosystem, admin interface |
 | **Pandas** | Data Processing | Industry standard for data manipulation, Excel integration |
 | **PostgreSQL 16** | Primary Database | ACID compliance, JSON support, excellent performance |
-| **Redis 7.4** | Cache & Sessions | Fast in-memory store, pub/sub capabilities |
+| **Database Cache** | Cache & Sessions | NIST-approved database-backed caching, session persistence |
 | **Docker & Alpine** | Containerization | Minimal attack surface, fast builds, consistent environments |
 | **Pydantic** | Data Validation | Type safety, automatic validation, excellent DX |
 | **SQLAlchemy** | ORM | Database abstraction, migration support, connection pooling |
@@ -67,8 +67,8 @@ This document provides a comprehensive technical design overview of the Excel An
 │  ┌─────────────────────────────▼─────────────────────────────────┐         │
 │  │                       Persistence Layer                        │         │
 │  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐ │         │
-│  │  │   PostgreSQL    │  │      Redis      │  │   File Storage  │ │         │
-│  │  │   (Metadata)    │  │     (Cache)     │  │    (Volumes)    │ │         │
+│  │  │   PostgreSQL    │  │  DB Cache       │  │   File Storage  │ │         │
+│  │  │   (Metadata)    │  │  (NIST Cache)   │  │    (Volumes)    │ │         │
 │  │  └─────────────────┘  └─────────────────┘  └─────────────────┘ │         │
 │  └─────────────────────────────────────────────────────────────────┘         │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -101,10 +101,10 @@ This document provides a comprehensive technical design overview of the Excel An
    - **Transaction Management**: ACID compliance with rollback support
 
 2. **Web Service ↔ Cache Service**
-   - **Protocol**: Redis protocol over TCP
-   - **Use Cases**: Session storage, query caching, rate limiting
-   - **Persistence**: Configurable (memory-only for sessions, persistent for cache)
-   - **Failover**: Graceful degradation when Redis unavailable
+   - **Protocol**: Database connections via Django ORM
+   - **Use Cases**: Session storage, query caching, rate limiting (NIST-compliant)
+   - **Persistence**: Full persistence via PostgreSQL database cache
+   - **Failover**: Database-backed reliability and ACID compliance
 
 3. **Web Service ↔ Worker Service**
    - **Protocol**: Internal API calls or message queue (future Celery integration)
@@ -461,8 +461,9 @@ Testing Pyramid:
    - Read replicas for scaling (future)
 
 2. **Caching Strategy**
-   - Redis for session storage
-   - Query result caching
+   - PostgreSQL database cache for NIST compliance
+   - Database-backed session storage for persistence
+   - Query result caching via database cache
    - Static file caching via Nginx
    - Application-level caching
 

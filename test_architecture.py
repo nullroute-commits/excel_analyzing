@@ -40,7 +40,7 @@ class TestEnvironmentStructure:
         expected_structure = {
             "web": "django",
             "database": "postgresql", 
-            "cache": "redis",
+            "cache": "database",
             "processing": "core"
         }
         
@@ -52,7 +52,7 @@ class TestEnvironmentStructure:
         """Test that environment files exist for all environments."""
         base_path = Path(__file__).parent / "env"
         environments = ["development", "test", "production"]
-        services = ["web/django", "database/postgresql", "cache/redis", "processing/core"]
+        services = ["web/django", "database/postgresql", "cache/database", "processing/core"]
         
         for service in services:
             for env in environments:
@@ -131,17 +131,20 @@ class TestHostnameBasedServiceDiscovery:
         assert "localhost" not in settings.database_url
         assert "127.0.0.1" not in settings.database_url
 
-    def test_hostname_based_redis_configuration(self):
-        """Test that Redis configuration uses hostnames not localhost."""
+    def test_database_cache_configuration(self):
+        """Test that cache configuration uses database backend for NIST compliance."""
         settings = get_settings()
         
-        # Redis host should not be localhost or 127.0.0.1
-        assert settings.redis_host not in ["localhost", "127.0.0.1"]
-        assert "service" in settings.redis_host.lower()  # Should contain 'service'
+        # Cache backend should be database-based for NIST compliance
+        assert settings.cache_backend == "django.core.cache.backends.db.DatabaseCache"
         
-        # Redis URL should use hostname
-        assert "localhost" not in settings.redis_url
-        assert "127.0.0.1" not in settings.redis_url
+        # Cache location should be configured
+        assert settings.cache_location
+        assert "cache_table" in settings.cache_location
+        
+        # Cache timeout should be reasonable
+        assert settings.cache_timeout > 0
+        assert settings.cache_timeout <= 3600  # Max 1 hour
 
     def test_environment_specific_hostnames(self):
         """Test that different environments use environment-specific hostnames."""
@@ -240,10 +243,15 @@ class TestDockerComposeConfiguration:
             content = compose_path.read_text()
             
             # Should contain service names that follow hostname pattern
-            expected_services = ["web-service", "db-service", "cache-service"]
+            # Note: cache-service removed as we now use database-backed caching
+            expected_services = ["web-service", "db-service"]
             for service in expected_services:
                 assert service in content or service.replace("-", "_") in content, \
                     f"Docker Compose should define {service} service"
+            
+            # Verify cache-service is NOT present (replaced with database caching)
+            assert "cache-service" not in content, \
+                "cache-service should not be present (replaced with database caching for NIST compliance)"
 
 
 class TestSecurityConfiguration:

@@ -46,11 +46,10 @@ class Settings(BaseSettings):  # type: ignore
     database_pool_size: int = Field(default=10, description="Database pool size")
     database_max_overflow: int = Field(default=20, description="Database max overflow")
 
-    # Cache settings (hostname-based)
-    redis_host: str = Field(default="cache-service", description="Redis hostname")
-    redis_port: int = Field(default=6379, description="Redis port")
-    redis_db: int = Field(default=0, description="Redis database")
-    redis_password: str = Field(default="", description="Redis password")
+    # Cache settings (database-based for NIST compliance)
+    cache_backend: str = Field(default="django.core.cache.backends.db.DatabaseCache", description="Cache backend")
+    cache_location: str = Field(default="cache_table", description="Cache table name")
+    cache_timeout: int = Field(default=300, description="Default cache timeout in seconds")
 
     # Excel processing settings
     max_file_size_mb: int = Field(default=100, description="Max file size in MB")
@@ -101,14 +100,9 @@ class Settings(BaseSettings):  # type: ignore
         )
 
     @property
-    def redis_url(self) -> str:
-        """Construct Redis URL from hostname-based components."""
-        if self.redis_password:
-            return (
-                f"redis://:{self.redis_password}@{self.redis_host}:"
-                f"{self.redis_port}/{self.redis_db}"
-            )
-        return f"redis://{self.redis_host}:{self.redis_port}/{self.redis_db}"
+    def cache_url(self) -> str:
+        """Construct cache configuration for database backend."""
+        return f"{self.cache_backend}://{self.cache_location}"
 
     @validator("allowed_hosts", pre=True)
     def parse_allowed_hosts(cls, v: Any) -> List[str]:
@@ -146,10 +140,9 @@ def get_settings() -> Settings:
         "DATABASE_NAME",
         "DATABASE_USER",
         "DATABASE_PASSWORD",
-        "REDIS_HOST",
-        "REDIS_PORT",
-        "REDIS_DB",
-        "REDIS_PASSWORD",
+        "CACHE_BACKEND",
+        "CACHE_LOCATION",
+        "CACHE_TIMEOUT",
         "API_BASE_URL",
         "FRONTEND_URL",
     ]
@@ -161,7 +154,7 @@ def get_settings() -> Settings:
     env_files = [
         base_path / "web" / "django" / f".env.{env}",
         base_path / "database" / "postgresql" / f".env.{env}",
-        base_path / "cache" / "redis" / f".env.{env}",
+        base_path / "cache" / "database" / f".env.{env}",
         base_path / "processing" / "core" / f".env.{env}",
     ]
 

@@ -164,13 +164,24 @@ EXCEL_ANALYZING = {
     "MAX_CONCURRENT_JOBS": app_settings.max_concurrent_jobs,
 }
 
-# Cache configuration (Redis)
+# Cache configuration (Database-based for NIST compliance)
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": app_settings.redis_url,
+        "BACKEND": app_settings.cache_backend,
+        "LOCATION": app_settings.cache_location,
+        "TIMEOUT": app_settings.cache_timeout,
+        "OPTIONS": {
+            "MAX_ENTRIES": 1000,
+        }
     }
 }
+
+# Session configuration (Database-based for NIST compliance)
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_CACHE_ALIAS = "default"
+SESSION_COOKIE_AGE = 1800  # 30 minutes
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # API Base URL for internal service communication
 API_BASE_URL = app_settings.api_base_url

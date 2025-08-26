@@ -15,10 +15,8 @@ services:
     environment:
       - ENVIRONMENT=production
       - DATABASE_HOST=prod-db-service
-      - REDIS_HOST=prod-cache-service
     depends_on:
       - db-service
-      - cache-service
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
@@ -39,15 +37,6 @@ services:
     networks:
       - excel-network
 
-  cache-service:
-    image: redis:7.4-alpine
-    container_name: prod-cache-service
-    hostname: prod-cache-service
-    env_file:
-      - ./env/cache/redis/.env.production
-    restart: unless-stopped
-    networks:
-      - excel-network
 
   nginx-service:
     image: nginx:alpine
@@ -80,10 +69,8 @@ services:
     environment:
       - ENVIRONMENT=production
       - DATABASE_HOST=prod-db-service
-      - REDIS_HOST=prod-cache-service
     depends_on:
       - db-service
-      - cache-service
     volumes:
       - data_volume:/app/data
       - logs_volume:/app/logs

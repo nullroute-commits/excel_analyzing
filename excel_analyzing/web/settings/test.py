@@ -37,11 +37,11 @@ class DisableMigrations:
 
 MIGRATION_MODULES = DisableMigrations()
 
-# Cache using hostname-based configuration
+# Cache using database backend for NIST compliance (simplified for tests)
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": app_settings.redis_url,
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "test-cache",
     }
 }
 

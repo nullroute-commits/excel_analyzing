@@ -38,10 +38,14 @@ EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() == "true"
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 
-# Cache using hostname-based configuration from app_settings
+# Cache using database backend for NIST compliance
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": app_settings.redis_url,
+        "BACKEND": app_settings.cache_backend,
+        "LOCATION": app_settings.cache_location,
+        "TIMEOUT": app_settings.cache_timeout,
+        "OPTIONS": {
+            "MAX_ENTRIES": 10000,
+        }
     }
 }

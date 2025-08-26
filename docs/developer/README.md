@@ -1087,9 +1087,9 @@ Each environment uses hostname-based service discovery:
 
 | Environment | Web Service | Database Service | Cache Service |
 |------------|-------------|------------------|---------------|
-| Development | `dev-web-service:8000` | `dev-db-service:5432` | `dev-cache-service:6379` |
-| Test | `test-web-service:8000` | `test-db-service:5432` | `test-cache-service:6379` |
-| Production | `prod-web-service:8000` | `prod-db-service:5432` | `prod-cache-service:6379` |
+| Development | `dev-web-service:8000` | `dev-db-service:5432` | `Database Cache (PostgreSQL)` |
+| Test | `test-web-service:8000` | `test-db-service:5432` | `Database Cache (PostgreSQL)` |
+| Production | `prod-web-service:8000` | `prod-db-service:5432` | `Database Cache (PostgreSQL)` |
 
 ### Monitoring
 
