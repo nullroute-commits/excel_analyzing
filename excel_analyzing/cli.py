@@ -108,14 +108,24 @@ def process(
     null_threshold: float,
 ) -> None:
     """Process Excel workbooks in the specified path."""
+    from pydantic import ValidationError
 
-    # Create processing options
-    options = ProcessingOptions(
-        drop_empty_rows=drop_empty_rows,
-        drop_empty_columns=drop_empty_columns,
-        clean_column_names=clean_column_names,
-        null_threshold=null_threshold,
-    )
+    # Create processing options with proper error handling
+    try:
+        options = ProcessingOptions(
+            drop_empty_rows=drop_empty_rows,
+            drop_empty_columns=drop_empty_columns,
+            clean_column_names=clean_column_names,
+            null_threshold=null_threshold,
+        )
+    except ValidationError as e:
+        # Convert Pydantic validation error to Click error (exit code 2)
+        error_msg = []
+        for error in e.errors():
+            field = error["loc"][0] if error["loc"] else "unknown"
+            msg = error["msg"]
+            error_msg.append(f"{field}: {msg}")
+        raise click.BadParameter("\n".join(error_msg))
 
     # Initialize pipeline
     pipeline = ExcelPipeline(options)
