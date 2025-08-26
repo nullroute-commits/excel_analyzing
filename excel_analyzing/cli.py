@@ -110,12 +110,16 @@ def process(
     """Process Excel workbooks in the specified path."""
 
     # Create processing options
-    options = ProcessingOptions(
-        drop_empty_rows=drop_empty_rows,
-        drop_empty_columns=drop_empty_columns,
-        clean_column_names=clean_column_names,
-        null_threshold=null_threshold,
-    )
+    try:
+        options = ProcessingOptions(
+            drop_empty_rows=drop_empty_rows,
+            drop_empty_columns=drop_empty_columns,
+            clean_column_names=clean_column_names,
+            null_threshold=null_threshold,
+        )
+    except Exception as e:
+        console.print(f"❌ Invalid options: {e}", style="red")
+        raise click.BadParameter(str(e))
 
     # Initialize pipeline
     pipeline = ExcelPipeline(options)
