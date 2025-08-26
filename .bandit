@@ -1,0 +1,41 @@
+[bandit]
+# Bandit security linting configuration
+
+# Paths to exclude from scanning
+exclude_dirs = [
+    "tests",
+    "migrations", 
+    "venv",
+    "env",
+    ".venv",
+    "node_modules",
+    "__pycache__"
+]
+
+# Test categories to skip (use with caution)
+skips = [
+    # Skip hardcoded password tests in test files
+    # "B105",  # hardcoded_password_string
+    # "B106",  # hardcoded_password_funcarg
+    # "B107",  # hardcoded_password_default
+]
+
+# Security issue severity levels to report
+# LOW, MEDIUM, HIGH
+confidence = ["HIGH", "MEDIUM"]
+severity = ["HIGH", "MEDIUM"]
+
+# Tests to include (empty means all tests)
+tests = []
+
+# Format for output
+format = "json"
+
+# Output file
+output = "bandit-report.json"
+
+# Include confidence level in output
+include_confidence = true
+
+# Aggregate duplicate issues
+aggregate = "file"

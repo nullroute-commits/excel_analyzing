@@ -4,6 +4,50 @@ import hashlib
 import os
 from pathlib import Path
 from typing import Generator, List, Optional, Set
+import re
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def sanitize_filename(filename: str) -> str:
+    """
+    Sanitize filename to prevent security issues.
+    
+    Args:
+        filename: Raw filename to sanitize
+        
+    Returns:
+        Sanitized filename safe for filesystem operations
+    """
+    if not filename:
+        return "unnamed_file"
+    
+    # Remove or replace dangerous characters
+    # Remove control characters and dangerous symbols
+    safe = re.sub(r'[<>:"|?*;\x00-\x1f`$()&]', '', filename)
+    
+    # Remove leading/trailing dots and spaces
+    safe = safe.strip('. ')
+    
+    # Replace multiple consecutive spaces with single space
+    safe = re.sub(r'\s+', ' ', safe)
+    
+    # Limit length to 255 characters (filesystem limit)
+    if len(safe) > 255:
+        name, ext = os.path.splitext(safe)
+        max_name_length = 255 - len(ext)
+        safe = name[:max_name_length] + ext
+    
+    # Ensure we have something left
+    if not safe or safe in ['.', '..']:
+        safe = "sanitized_file"
+    
+    # Ensure it doesn't start with a dot (hidden file)
+    if safe.startswith('.'):
+        safe = 'file_' + safe[1:]
+    
+    return safe
 
 
 def get_file_hash(file_path: Path, algorithm: str = "md5") -> str:
