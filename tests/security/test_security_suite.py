@@ -76,38 +76,21 @@ class TestInputSanitization:
         ]
         
         for filename in dangerous_filenames:
-            try:
-                safe_filename = sanitize_filename(filename)
-                
-                # Test that dangerous characters are removed or escaped
-                assert '<' not in safe_filename
-                assert '>' not in safe_filename
-                assert ';' not in safe_filename
-                assert '`' not in safe_filename
-                assert '$' not in safe_filename
-                assert '\x00' not in safe_filename
-                assert len(safe_filename) <= 255
-                
-                # Ensure we still have a valid filename
-                assert safe_filename.strip()
-                assert not safe_filename.startswith('.')
-                
-            except ImportError:
-                # If sanitize_filename doesn't exist yet, create a basic implementation
-                safe_filename = self._basic_sanitize_filename(filename)
-                assert safe_filename is not None
+            safe_filename = sanitize_filename(filename)
+            
+            # Test that dangerous characters are removed or escaped
+            assert '<' not in safe_filename
+            assert '>' not in safe_filename
+            assert ';' not in safe_filename
+            assert '`' not in safe_filename
+            assert '$' not in safe_filename
+            assert '\x00' not in safe_filename
+            assert len(safe_filename) <= 255
+            
+            # Ensure we still have a valid filename
+            assert safe_filename.strip()
+            assert not safe_filename.startswith('.')
     
-    def _basic_sanitize_filename(self, filename):
-        """Basic filename sanitization for testing."""
-        import re
-        # Remove dangerous characters
-        safe = re.sub(r'[<>:"|?*;\x00-\x1f`$]', '', filename)
-        # Limit length
-        safe = safe[:255]
-        # Ensure it's not empty or just dots
-        if not safe.strip() or safe.strip() == '.':
-            safe = 'sanitized_file.xlsx'
-        return safe
     
     def test_excel_formula_injection(self):
         """Test prevention of Excel formula injection."""
