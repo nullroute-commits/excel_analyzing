@@ -253,10 +253,6 @@ class TestSecurityConfiguration:
         """Test that Django secret key meets security requirements."""
         settings = get_settings()
         
-        # Skip test if using environment variable placeholder (production)
-        if settings.django_secret_key.startswith("${") or not settings.django_secret_key:
-        # Skip test if in production and secret key is not set (i.e., expected to be provided via env var)
-        if settings.environment == Environment.PRODUCTION and not settings.django_secret_key:
         # Skip test if using environment variable placeholder, or if in production and secret key is not set
         if settings.django_secret_key.startswith("${") or (
             settings.environment == Environment.PRODUCTION and not settings.django_secret_key
