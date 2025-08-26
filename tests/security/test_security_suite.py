@@ -64,7 +64,7 @@ class TestInputSanitization:
     
     def test_filename_sanitization(self):
         """Test filename sanitization."""
-        from excel_analyzing.utils.files import sanitize_filename  # We'll create this
+        from excel_analyzing.utils.files import sanitize_filename
         
         dangerous_filenames = [
             "file<script>alert('xss')</script>.xlsx",
