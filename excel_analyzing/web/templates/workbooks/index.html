@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1>Welcome to Excel Analyzing</h1>
+        <p class="lead">A comprehensive tool for analyzing Excel workbooks with advanced data processing capabilities.</p>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Upload Workbook</h5>
+                        <p class="card-text">Upload and analyze your Excel files with our advanced processing engine.</p>
+                        <a href="{% url 'workbooks:workbook_upload' %}" class="btn btn-primary">Upload Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">View Workbooks</h5>
+                        <p class="card-text">Browse and manage your previously uploaded workbooks.</p>
+                        <a href="{% url 'workbooks:workbook_list' %}" class="btn btn-secondary">View Workbooks</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <h3>Features</h3>
+        <ul class="list-group">
+            <li class="list-group-item">Schema Detection</li>
+            <li class="list-group-item">Data Quality Analysis</li>
+            <li class="list-group-item">Type Inference</li>
+            <li class="list-group-item">Data Cleaning</li>
+            <li class="list-group-item">REST API</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

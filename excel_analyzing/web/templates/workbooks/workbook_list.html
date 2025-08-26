@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Workbooks{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Workbooks</h1>
+    <a href="{% url 'workbooks:workbook_upload' %}" class="btn btn-primary">Upload New Workbook</a>
+</div>
+
+{% if workbooks %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>File Name</th>
+                    <th>Upload Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for workbook in workbooks %}
+                <tr>
+                    <td>{{ workbook.name }}</td>
+                    <td>{{ workbook.file_name }}</td>
+                    <td>{{ workbook.created_at|date:"M d, Y H:i" }}</td>
+                    <td>
+                        <a href="{% url 'workbooks:workbook_detail' workbook.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <nav aria-label="Workbooks pagination">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+            {% endif %}
+            
+            <li class="page-item active">
+                <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+            
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+{% else %}
+    <div class="text-center py-5">
+        <h3>No Workbooks Found</h3>
+        <p class="text-muted">You haven't uploaded any workbooks yet.</p>
+        <a href="{% url 'workbooks:workbook_upload' %}" class="btn btn-primary">Upload Your First Workbook</a>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}{{ workbook.name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'workbooks:index' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'workbooks:workbook_list' %}">Workbooks</a></li>
+        <li class="breadcrumb-item active">{{ workbook.name }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-8">
+        <h1>{{ workbook.name }}</h1>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5>Workbook Information</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">File Name:</dt>
+                    <dd class="col-sm-9">{{ workbook.file_name }}</dd>
+                    
+                    <dt class="col-sm-3">Upload Date:</dt>
+                    <dd class="col-sm-9">{{ workbook.created_at|date:"M d, Y H:i" }}</dd>
+                    
+                    <dt class="col-sm-3">File Path:</dt>
+                    <dd class="col-sm-9"><code>{{ workbook.file_path }}</code></dd>
+                    
+                    {% if workbook.sheets.all %}
+                    <dt class="col-sm-3">Sheets:</dt>
+                    <dd class="col-sm-9">
+                        <ul class="list-unstyled">
+                            {% for sheet in workbook.sheets.all %}
+                            <li><strong>{{ sheet.name }}</strong> - {{ sheet.total_rows }} rows, {{ sheet.total_columns }} columns</li>
+                            {% endfor %}
+                        </ul>
+                    </dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+        
+        {% if workbook.sheets.all %}
+        <div class="mt-4">
+            <h3>Sheet Details</h3>
+            {% for sheet in workbook.sheets.all %}
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>{{ sheet.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Total Rows:</strong> {{ sheet.total_rows }}</p>
+                            <p><strong>Total Columns:</strong> {{ sheet.total_columns }}</p>
+                            <p><strong>Data Start Row:</strong> {{ sheet.data_start_row }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            {% if sheet.columns.all %}
+                            <strong>Columns:</strong>
+                            <ul class="list-unstyled">
+                                {% for column in sheet.columns.all|slice:":5" %}
+                                <li>{{ column.name }} ({{ column.data_type }})</li>
+                                {% endfor %}
+                                {% if sheet.columns.all|length > 5 %}
+                                <li><em>... and {{ sheet.columns.all|length|add:"-5" }} more</em></li>
+                                {% endif %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" disabled>Download Data (Coming Soon)</button>
+                    <button class="btn btn-secondary" disabled>Export Schema (Coming Soon)</button>
+                    <button class="btn btn-info" disabled>View Analytics (Coming Soon)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

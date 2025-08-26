@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Workbook{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'workbooks:index' %}">Home</a></li>
+        <li class="breadcrumb-item active">Upload Workbook</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h1>Upload Workbook</h1>
+        
+        <div class="card">
+            <div class="card-body">
+                <form id="uploadForm" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Workbook Name</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter a name for this workbook" required>
+                        <div class="form-text">Give your workbook a descriptive name for easy identification.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Excel File</label>
+                        <input type="file" class="form-control" id="file" name="file" accept=".xlsx,.xls" required>
+                        <div class="form-text">Supported formats: .xlsx, .xls</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="processImmediately" checked>
+                            <label class="form-check-label" for="processImmediately">
+                                Process immediately after upload
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'workbooks:workbook_list' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Upload Workbook</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div id="uploadProgress" class="mt-3" style="display: none;">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+            </div>
+            <p class="mt-2 text-center">Uploading...</p>
+        </div>
+        
+        <div id="uploadResult" class="mt-3" style="display: none;">
+            <div class="alert" role="alert"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const progressDiv = document.getElementById('uploadProgress');
+    const resultDiv = document.getElementById('uploadResult');
+    const submitBtn = this.querySelector('button[type="submit"]');
+    
+    // Show progress
+    progressDiv.style.display = 'block';
+    resultDiv.style.display = 'none';
+    submitBtn.disabled = true;
+    
+    fetch(this.action || window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        progressDiv.style.display = 'none';
+        resultDiv.style.display = 'block';
+        
+        const alertDiv = resultDiv.querySelector('.alert');
+        if (data.success) {
+            alertDiv.className = 'alert alert-success';
+            alertDiv.innerHTML = `
+                <strong>Success!</strong> ${data.message}<br>
+                <a href="{% url 'workbooks:workbook_list' %}" class="btn btn-sm btn-success mt-2">View Workbooks</a>
+            `;
+            this.reset();
+        } else {
+            alertDiv.className = 'alert alert-danger';
+            alertDiv.innerHTML = `<strong>Error!</strong> ${data.error}`;
+        }
+    })
+    .catch(error => {
+        progressDiv.style.display = 'none';
+        resultDiv.style.display = 'block';
+        
+        const alertDiv = resultDiv.querySelector('.alert');
+        alertDiv.className = 'alert alert-danger';
+        alertDiv.innerHTML = `<strong>Error!</strong> Upload failed. Please try again.`;
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+    });
+});
+</script>
+{% endblock %}
