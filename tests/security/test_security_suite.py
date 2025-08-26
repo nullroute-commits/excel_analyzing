@@ -184,6 +184,7 @@ class TestAuthenticationSecurity:
             assert settings.SESSION_COOKIE_SECURE, "Session cookies should be secure in production"
             assert settings.SESSION_COOKIE_HTTPONLY, "Session cookies should be HTTP-only"
     
+    @pytest.mark.django_db
     def test_brute_force_protection(self):
         """Test protection against brute force attacks."""
         from django.test import Client
@@ -342,6 +343,7 @@ class TestDataSecurity:
             assert isinstance(header, tuple) and len(header) == 2, \
                 "SECURE_PROXY_SSL_HEADER should be properly configured"
     
+    @pytest.mark.django_db
     def test_data_access_controls(self):
         """Test data access controls."""
         from django.contrib.auth.models import User, Permission
