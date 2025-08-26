@@ -35,9 +35,10 @@ COPY . .
 # Install the package
 RUN pip install -e .
 
-# Create directories
-RUN mkdir -p /app/logs /app/staticfiles && \
-    chown -R excel:excel /app
+# Create directories and fix permissions
+RUN mkdir -p /app/logs /app/staticfiles /app/.pytest_cache && \
+    chown -R excel:excel /app && \
+    chmod -R 755 /app
 
 # Switch to non-root user
 USER excel
