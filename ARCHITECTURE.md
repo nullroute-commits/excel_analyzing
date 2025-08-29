@@ -552,155 +552,101 @@ CMD ["python", "-m", "pytest", "--cov=excel_analyzing", "--cov-report=html", "--
 
 ### Container Orchestration & Service Mesh Integration
 
-#### Docker Compose Service Definitions with Advanced Networking
+#### Docker Compose Service Definitions - Actual Implementation
 
 ```yaml
-# docker-compose.yml - Production Service Orchestration
-version: '3.8'
-
+# docker-compose.yml - Production Service Orchestration  
 services:
-  # Primary Web Service with Load Balancing
   web-service:
     build:
       context: .
       dockerfile: Dockerfile
-      target: production
-      args:
-        - BUILDKIT_INLINE_CACHE=1
-    image: excel-analyzing/web:${VERSION:-latest}
     container_name: prod-web-service
-    restart: unless-stopped
-    depends_on:
-      db-service:
-        condition: service_healthy
-      cache-service:
-        condition: service_healthy
-    environment:
-      - ENVIRONMENT=production
-      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@db-service:5432/excel_analyzing
-      - REDIS_URL=redis://cache-service:6379/0
-      - CELERY_BROKER_URL=redis://cache-service:6379/1
+    hostname: prod-web-service
     ports:
       - "8000:8000"
-    volumes:
-      - static-data:/app/static
-      - media-data:/app/media
-      - log-data:/app/logs
-    networks:
-      - frontend
-      - backend
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.web.rule=Host(`excel-analyzing.com`)"
-      - "traefik.http.services.web.loadbalancer.server.port=8000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  # Database Service with High Availability
-  db-service:
-    image: postgres:15-alpine
-    container_name: prod-db-service
-    restart: unless-stopped
+    env_file:
+      - ./env/web/django/.env.production
+      - ./env/processing/core/.env.production
     environment:
-      - POSTGRES_DB=excel_analyzing
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-      - ./scripts/db-init:/docker-entrypoint-initdb.d
-    networks:
-      - backend
-    ports:
-      - "5432:5432"
-    command: |
-      postgres
-        -c max_connections=200
-        -c shared_buffers=256MB
-        -c effective_cache_size=1GB
-        -c maintenance_work_mem=64MB
-        -c checkpoint_completion_target=0.9
-        -c wal_buffers=16MB
-        -c default_statistics_target=100
-        -c random_page_cost=1.1
-        -c effective_io_concurrency=200
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d excel_analyzing"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-
-  # Redis Cache Service with Persistence
-  cache-service:
-    image: redis:7-alpine
-    container_name: prod-cache-service
-    restart: unless-stopped
-    command: |
-      redis-server
-        --appendonly yes
-        --appendfsync everysec
-        --maxmemory 1gb
-        --maxmemory-policy allkeys-lru
-        --save 900 1
-        --save 300 10
-        --save 60 10000
-    volumes:
-      - redis-data:/data
-    networks:
-      - backend
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # Background Worker Service
-  worker-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: production
-    image: excel-analyzing/worker:${VERSION:-latest}
-    container_name: prod-worker-service
-    restart: unless-stopped
+      - ENVIRONMENT=production
+      - DATABASE_HOST=prod-db-service
+      - REDIS_HOST=prod-cache-service
     depends_on:
       - db-service
       - cache-service
-    environment:
-      - ENVIRONMENT=production
-      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@db-service:5432/excel_analyzing
-      - CELERY_BROKER_URL=redis://cache-service:6379/1
-      - CELERY_RESULT_BACKEND=redis://cache-service:6379/2
     volumes:
-      - media-data:/app/media
-      - log-data:/app/logs
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+      - logs_volume:/app/logs
+    restart: unless-stopped
     networks:
-      - backend
-    command: ["celery", "worker", "-A", "excel_analyzing.web.celery", "--loglevel=info", "--concurrency=4"]
+      - excel-network
 
-# Network Configuration with Service Isolation
+  db-service:
+    image: postgres:16-alpine
+    container_name: prod-db-service
+    hostname: prod-db-service
+    env_file:
+      - ./env/database/postgresql/.env.production
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - excel-network
+
+  cache-service:
+    image: redis:7.4-alpine
+    container_name: prod-cache-service
+    hostname: prod-cache-service
+    env_file:
+      - ./env/cache/redis/.env.production
+    restart: unless-stopped
+    networks:
+      - excel-network
+
 networks:
-  frontend:
+  excel-network:
     driver: bridge
-    name: excel-analyzing-frontend
-  backend:
-    driver: bridge
-    name: excel-analyzing-backend
-    internal: true
 
-# Persistent Volume Configuration
 volumes:
-  postgres-data:
-    driver: local
-    name: excel-analyzing-postgres-data
-  redis-data:
+  postgres_data:
+  static_volume:
+  media_volume:
+  logs_volume:
+
+### Development Environment Configuration
+
+The development environment uses simplified Docker Compose setup with `docker-compose.dev.yml`:
+
+```yaml
+services:
+  web-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: dev-web-service
+    hostname: dev-web-service
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./env/web/django/.env.development
+      - ./env/processing/core/.env.development
+    environment:
+      - ENVIRONMENT=development
+      - DATABASE_HOST=dev-db-service
+      - REDIS_HOST=dev-cache-service
+    depends_on:
+      - db-service
+      - cache-service
+    volumes:
+      - .:/app
+      - ./test_data:/app/test_data
+    command: python manage.py runserver 0.0.0.0:8000
+    restart: unless-stopped
+    networks:
+      - excel-dev-network
+```
     driver: local
     name: excel-analyzing-redis-data
   static-data:
@@ -714,15 +660,71 @@ volumes:
     name: excel-analyzing-log-data
 ```
 
+## 🌐 RESTful API Architecture & Implementation
+
+### Current API Structure
+
+The Excel Analyzing framework implements a clean RESTful API using Django REST Framework with the following endpoints:
+
+#### API Endpoints
+
+| Endpoint | Method | Purpose | Authentication |
+|----------|--------|---------|----------------|
+| `/api/` | GET | API root with version info | AllowAny |
+| `/api/workbooks/` | GET, POST | List/Create workbooks | AllowAny |
+| `/api/workbooks/{id}/` | GET, PUT, DELETE | Workbook details | IsAuthenticated |
+| `/api/health/` | GET | Health check endpoint | AllowAny |
+
+#### API Response Examples
+
+**API Root (`GET /api/`)**:
+```json
+{
+  "message": "Excel Analyzing API",
+  "version": "1.0",
+  "endpoints": {
+    "workbooks": "/api/workbooks/",
+    "health": "/api/health/"
+  }
+}
+```
+
+**Health Check (`GET /api/health/`)**:
+```json
+{
+  "status": "healthy",
+  "service": "excel-analyzing"
+}
+```
+
+### Web Interface Integration
+
+The system provides a Bootstrap 5-based responsive web interface featuring:
+
+- **Base Template**: `excel_analyzing/web/templates/base.html` with responsive navigation
+- **Workbook Management**: CRUD operations for Excel file processing
+- **Bootstrap 5 Components**: Modern UI with cards, forms, and navigation
+- **Django Template System**: Server-side rendering with template inheritance
+
 ## 🌐 Hostname-Based Service Discovery
 
 ### Environment-Specific Hostnames
+
+The system uses simplified hostname-based service discovery within Docker networks:
 
 | Environment | Web Service | Database Service | Cache Service |
 |------------|-------------|------------------|---------------|
 | **Development** | `dev-web-service:8000` | `dev-db-service:5432` | `dev-cache-service:6379` |
 | **Test** | `test-web-service:8000` | `test-db-service:5432` | `test-cache-service:6379` |
 | **Production** | `prod-web-service:8000` | `prod-db-service:5432` | `prod-cache-service:6379` |
+
+### Actual Docker Compose Implementation
+
+The current implementation uses consistent service naming across environments:
+
+- **Web Service**: `web-service` (containerized as `{env}-web-service`)
+- **Database Service**: `db-service` (containerized as `{env}-db-service`) 
+- **Cache Service**: `cache-service` (containerized as `{env}-cache-service`)
 
 ### Benefits
 

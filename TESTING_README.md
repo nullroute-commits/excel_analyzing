@@ -37,7 +37,21 @@ tests/
 
 ## 🚀 Quick Start
 
-### Run All Tests
+### Using Docker Compose (Recommended)
+
+```bash
+# Run unit and integration tests
+docker-compose -f docker-compose.test.yml up web-service
+
+# Run end-to-end tests
+docker-compose -f docker-compose.test.yml up e2e-service
+
+# Run all tests together
+docker-compose -f docker-compose.test.yml up
+```
+
+### Local Development Testing
+
 ```bash
 # Using the test runner script
 python run_tests.py --all
@@ -45,7 +59,7 @@ python run_tests.py --all
 # Using tox
 tox -e all-tests
 
-# Using pytest
+# Using pytest directly
 pytest tests/ -v
 ```
 

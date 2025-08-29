@@ -19,10 +19,10 @@ The framework employs a multi-layered hexagonal architecture (Ports and Adapters
 - **Enterprise-Grade Data Sanitization**: Comprehensive data cleaning pipeline implementing multiple stages of validation including empty row/column elimination using sparse matrix analysis, column name normalization with Unicode handling and collision detection, null value imputation strategies, and outlier detection using interquartile range (IQR) and z-score methodologies
 
 ### Multi-Environment Infrastructure & DevOps Integration
-- **Containerized Microservices Architecture**: Complete Docker-based deployment strategy with Alpine Linux base images, multi-stage builds for optimization, and environment-specific configuration management supporting development, testing, staging, and production environments with horizontal scaling capabilities
-- **RESTful API Gateway**: Django REST Framework-based API layer implementing OpenAPI 3.0 specifications, JWT authentication, rate limiting using token bucket algorithms, request/response validation with Pydantic models, and comprehensive error handling with structured logging
-- **Real-time WebSocket Communications**: Asynchronous event-driven communication system using Django Channels with Redis backend for broadcasting processing status updates, progress notifications, and system health metrics with automatic reconnection and message queuing
-- **Advanced Command Line Interface**: Rich-enabled CLI application built with Click framework providing extensive command chaining, auto-completion support, progress bars with ETA calculations, colored output with semantic highlighting, and comprehensive help system with usage examples
+- **Containerized Microservices Architecture**: Complete Docker-based deployment strategy with Alpine Linux base images, multi-stage builds for optimization, and environment-specific configuration management supporting development, testing, and production environments
+- **RESTful API Gateway**: Django REST Framework-based API layer with simple JSON endpoints for workbook management, health checking, and data processing status. Features include configurable permissions, request/response validation, and structured error handling
+- **Web Interface**: Bootstrap 5-based responsive web interface with Django templates for workbook management, file upload, and processing status monitoring
+- **Command Line Interface**: Click-based CLI application with rich formatting for data processing operations
 
 ### High-Performance Storage & Persistence Layer
 - **PostgreSQL Integration**: Native PostgreSQL database integration with advanced features including JSONB document storage for metadata, full-text search capabilities using GIN indexes, table partitioning for large datasets, and connection pooling with automatic failover support
@@ -38,51 +38,57 @@ The framework employs a multi-layered hexagonal architecture (Ports and Adapters
 The Excel Analyzing framework implements a sophisticated N-tier architecture with clear separation of concerns, following Domain-Driven Design principles and implementing the Onion Architecture pattern for maximum testability and maintainability.
 
 ### Layer 1: Presentation & Interface Abstraction
-```
+
+```text
 excel_analyzing/
 ├── web/                    # Django-based web interface with Model-View-Template pattern
-│   ├── views/              # Request handlers implementing RESTful resource patterns
-│   ├── serializers/        # DRF serializers with custom field validation
-│   ├── templates/          # Jinja2 templates with responsive Bootstrap UI
-│   ├── static/             # CSS/JS assets with Webpack bundling
-│   └── websockets/         # Django Channels WebSocket consumers
-├── cli.py                  # Click-based command interface with rich formatting
-└── api/                    # OpenAPI specification and documentation
+│   ├── apps/api/           # REST API endpoints with Django REST Framework
+│   ├── templates/          # Bootstrap 5 HTML templates for web interface
+│   ├── static/             # CSS/JS assets and static files
+│   ├── settings/           # Environment-specific Django configuration
+│   ├── urls.py             # URL routing configuration
+│   └── wsgi.py            # WSGI application entry point
+├── cli.py                  # Click-based command interface
+└── manage.py              # Django management commands
 ```
 
 ### Layer 2: Application Services & Business Logic Orchestration
-```
-├── pipeline/               # Core data processing pipeline with Chain of Responsibility
-│   ├── orchestrator.py     # Master coordinator implementing Saga pattern
-│   ├── processor.py        # Data transformation engine with Strategy pattern
-│   ├── validators.py       # Business rule validation with Specification pattern
-│   └── transformers/       # Pluggable transformation modules
-├── services/               # Domain services implementing business use cases
-│   ├── workbook_service.py # Workbook lifecycle management
-│   ├── analysis_service.py # Statistical analysis and reporting
-│   └── export_service.py   # Data export and serialization
+
+```text
+├── pipeline/               # Core data processing pipeline
+│   ├── orchestrator.py     # Master processing coordinator
+│   └── processor.py        # Data transformation engine
+├── core/                   # Cross-cutting concerns and shared utilities
+│   ├── config.py           # Configuration management
+│   └── exceptions.py       # Custom exception definitions
+└── utils/                  # Utility functions and helper modules
+    ├── data_types.py       # Type inference and validation utilities
+    └── cleaning.py         # Data cleaning and sanitization
 ```
 
 ### Layer 3: Domain Model & Core Business Entities
-```
-├── models/                 # Domain models and data transfer objects
-│   ├── schemas.py          # Pydantic models with validation rules
-│   ├── database.py         # SQLAlchemy ORM entities with relationships
-│   ├── domain/             # Pure business logic entities
-│   └── value_objects/      # Immutable value objects for type safety
+
+```text
+├── models/                 # Domain models and data structures
+│   ├── schemas.py          # Pydantic models for data validation
+│   └── database.py         # SQLAlchemy ORM entities
+└── _version.py            # Version information management
 ```
 
 ### Layer 4: Infrastructure & External Concerns
-```
-├── core/                   # Cross-cutting concerns and infrastructure
-│   ├── config.py           # Environment-aware configuration management
-│   ├── logging.py          # Structured logging with correlation IDs
-│   ├── exceptions.py       # Custom exception hierarchy
-│   └── middleware/         # Request/response middleware components
-├── utils/                  # Utility functions and helper modules
-│   ├── file_handlers.py    # File system operations with error handling
-│   ├── data_types.py       # Type inference algorithms and utilities
-│   └── performance.py      # Performance monitoring and profiling
+
+```text
+├── docker-compose.yml      # Production container orchestration
+├── docker-compose.dev.yml  # Development environment setup
+├── docker-compose.test.yml # Test environment configuration
+├── Dockerfile             # Production container image
+├── Dockerfile.dev         # Development container image
+├── Dockerfile.test        # Test container image
+└── env/                   # Environment-specific configurations
+    ├── web/django/        # Django web service settings
+    ├── database/postgresql/ # PostgreSQL database settings
+    ├── cache/redis/       # Redis cache configuration
+    └── processing/core/   # Processing service settings
 ```
 
 ### Service Interaction Patterns & Communication Protocols
@@ -222,19 +228,41 @@ echo "DATABASE_POOL_SIZE=20" >> .env
 echo "DATABASE_MAX_OVERFLOW=30" >> .env
 ```
 
-#### Step 5: Database Initialization & Schema Setup
+#### Step 5: Container-Based Development Setup (Recommended)
+
 ```bash
-# Initialize database with proper schema and permissions
-excel-analyze init-db --verbose --create-extensions
+# Start development environment with Docker Compose
+docker-compose -f docker-compose.dev.yml up --build
 
-# Run database migrations with detailed logging
-python manage.py migrate --verbosity=2 --traceback
+# Verify services are running
+docker ps
 
-# Create superuser for administrative access
-python manage.py createsuperuser --email admin@example.com --username admin
+# Access the application
+# Web Interface: http://localhost:8000
+# API: http://localhost:8000/api/
+# Database: localhost:5432 (dev-db-service)
+# Cache: localhost:6379 (dev-cache-service)
 
-# Load initial data fixtures if available
-python manage.py loaddata fixtures/initial_data.json
+# View logs
+docker-compose -f docker-compose.dev.yml logs -f web-service
+
+# Run tests in container
+docker-compose -f docker-compose.test.yml up
+```
+
+#### Step 6: Verify Installation & Test with Real Data
+
+```bash
+# Test API endpoints
+curl http://localhost:8000/api/health/
+
+# Test with sample data (included in test_data/)
+# The development environment includes real Excel files for testing:
+# - population_data.xlsx (16,930 rows)
+# - sample_financial_data.xlsx (700 rows)
+# - gdp_data.csv (economic indicators)
+# - company_data.xlsx (business entities)
+# - employee_data.xlsx (HR records)
 ```
 
 ### Production Deployment Configuration
