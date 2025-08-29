@@ -1,53 +1,218 @@
-# Comprehensive Security Policy & Threat Analysis Framework
+# Security Policy
 
-## Executive Security Overview & Risk Assessment Matrix
+## Overview
 
-The Excel Analyzing framework implements a multi-layered security architecture following Defense in Depth principles, Zero Trust security model, and OWASP Top 10 mitigation strategies. This comprehensive security policy encompasses application security, infrastructure hardening, data protection, compliance frameworks, and incident response procedures.
+Excel Analyzing implements security best practices to protect against common vulnerabilities and ensure safe processing of Excel files.
 
-### Security Architecture & Defense Layers
+## Security Features
 
+### Input Validation
+
+**File Upload Security:**
+- File type validation (only Excel formats allowed)
+- File size limits (configurable, default 100MB)
+- File extension verification
+- Path traversal protection
+
+**Data Validation:**
+- Pydantic models for input validation
+- SQLAlchemy parameterized queries prevent SQL injection
+- Django CSRF protection enabled
+- Input sanitization for web forms
+
+### Authentication & Authorization
+
+**Web Interface:**
+- Django session-based authentication
+- CSRF protection on all forms
+- Secure session cookies (HTTPOnly, Secure flags)
+- Password hashing with PBKDF2
+
+**API Security:**
+- Session-based authentication for API endpoints
+- Rate limiting capabilities (configurable)
+- Proper HTTP status codes and error handling
+
+### Data Protection
+
+**Database Security:**
+- PostgreSQL with secure connection settings
+- Parameterized queries prevent SQL injection
+- Connection pooling with proper cleanup
+- Database access through ORM only
+
+**File Handling:**
+- Temporary file cleanup after processing
+- Secure file storage with proper permissions
+- No execution of file contents
+- Virus scanning capability (configurable)
+
+### Transport Security
+
+**HTTPS Configuration:**
+- TLS encryption for production deployments
+- Security headers implementation:
+  - HSTS (HTTP Strict Transport Security)
+  - X-Content-Type-Options: nosniff
+  - X-Frame-Options: DENY
+  - Content Security Policy
+- Secure cookie settings
+
+### Configuration Security
+
+**Environment Variables:**
+- Sensitive data stored in environment variables
+- No secrets in source code
+- Production secret key generation
+- Database credentials protection
+
+**Django Security Settings:**
+```python
+# Production security settings
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 ```
-Security Layer Topology:
-┌─────────────────────────────────────────────────────────────────────┐
-│                    Layer 7: Application Security                    │
-│  • Input Validation & Sanitization                                 │
-│  • Authentication & Authorization (OAuth 2.0/OIDC)                 │
-│  • Session Management & CSRF Protection                            │
-│  • SQL Injection Prevention (Parameterized Queries)                │
-│  • XSS Protection (Content Security Policy)                        │
-├─────────────────────────────────────────────────────────────────────┤
-│                    Layer 6: API Security Gateway                   │
-│  • Rate Limiting & DDoS Protection                                 │
-│  • API Authentication (JWT/Bearer Tokens)                          │
-│  • Request/Response Validation                                     │
-│  • API Versioning & Deprecation Management                         │
-├─────────────────────────────────────────────────────────────────────┤
-│                    Layer 5: Transport Security                     │
-│  • TLS 1.3 Encryption (AES-256-GCM)                               │
-│  • Certificate Pinning & HSTS                                      │
-│  • Perfect Forward Secrecy (ECDHE)                                │
-│  • SNI-based SSL/TLS Termination                                  │
-├─────────────────────────────────────────────────────────────────────┤
-│                    Layer 4: Network Security                       │
-│  • Firewall Rules & Access Control Lists                          │
-│  • VPN/Private Network Isolation                                  │
-│  • Intrusion Detection/Prevention (IDS/IPS)                       │
-│  • Network Segmentation & Micro-segmentation                      │
-├─────────────────────────────────────────────────────────────────────┤
-│                    Layer 3: Container Security                     │
-│  • Image Vulnerability Scanning                                   │
-│  • Runtime Security Monitoring                                    │
-│  • Secret Management (HashiCorp Vault)                            │
-│  • Non-root Container Execution                                   │
-├─────────────────────────────────────────────────────────────────────┤
-│                    Layer 2: Infrastructure Security                │
-│  • OS Hardening & Patch Management                                │
-│  • File System Encryption (LUKS/dm-crypt)                         │
-│  • Access Logging & Audit Trails                                  │
-│  • Backup Encryption & Versioning                                 │
-├─────────────────────────────────────────────────────────────────────┤
-│                    Layer 1: Physical Security                      │
-│  • Data Center Security Controls                                  │
+
+## Vulnerability Prevention
+
+### File Upload Attacks
+- **Prevention**: File type and size validation
+- **Detection**: Content type verification
+- **Mitigation**: Isolated processing environment
+
+### SQL Injection
+- **Prevention**: SQLAlchemy ORM with parameterized queries
+- **Detection**: No raw SQL queries in application code
+- **Mitigation**: Database permissions and access controls
+
+### Cross-Site Scripting (XSS)
+- **Prevention**: Django template auto-escaping
+- **Detection**: Input validation and sanitization
+- **Mitigation**: Content Security Policy headers
+
+### Cross-Site Request Forgery (CSRF)
+- **Prevention**: Django CSRF middleware enabled
+- **Detection**: CSRF tokens on all forms
+- **Mitigation**: SameSite cookie settings
+
+### Path Traversal
+- **Prevention**: File path validation and sanitization
+- **Detection**: Input validation on file operations
+- **Mitigation**: Restricted file system access
+
+## Security Configuration
+
+### Development Environment
+```bash
+# Basic security settings for development
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+DJANGO_SECRET_KEY=dev-secret-key-change-in-production
+```
+
+### Production Environment
+```bash
+# Enhanced security for production
+DEBUG=False
+ALLOWED_HOSTS=your-domain.com
+DJANGO_SECRET_KEY=cryptographically-secure-random-key
+SECURE_SSL_REDIRECT=True
+SESSION_COOKIE_SECURE=True
+CSRF_COOKIE_SECURE=True
+```
+
+## Security Testing
+
+### Automated Security Checks
+- **Bandit**: Static analysis for Python security issues
+- **Safety**: Dependency vulnerability scanning
+- **Pre-commit hooks**: Automated security validation
+
+### Manual Security Testing
+- Input validation testing
+- Authentication and authorization testing
+- File upload security testing
+- SQL injection testing
+
+### Security Test Examples
+```bash
+# Run security scanning
+bandit -r excel_analyzing/
+
+# Check for known vulnerabilities
+safety check
+
+# Run security-focused tests
+pytest tests/security/ -v
+```
+
+## Incident Response
+
+### Security Issue Reporting
+1. **Internal Issues**: Create GitHub issue with `security` label
+2. **External Reports**: Email security contact
+3. **Critical Issues**: Immediate notification to maintainers
+
+### Response Process
+1. **Assessment**: Evaluate severity and impact
+2. **Mitigation**: Implement immediate fixes if needed
+3. **Testing**: Verify fix effectiveness
+4. **Communication**: Notify users of security updates
+5. **Documentation**: Update security documentation
+
+## Security Best Practices
+
+### For Developers
+- Use environment variables for sensitive configuration
+- Validate all user inputs
+- Use parameterized database queries
+- Implement proper error handling without information leakage
+- Keep dependencies updated
+
+### For Administrators
+- Use HTTPS in production
+- Implement proper backup and recovery procedures
+- Monitor for security events and anomalies
+- Apply security updates promptly
+- Use strong passwords and secure authentication
+
+### For Users
+- Only upload trusted Excel files
+- Use secure connections (HTTPS)
+- Log out when finished
+- Report suspicious activity
+
+## Compliance Considerations
+
+### Data Privacy
+- No personal data is stored beyond processing requirements
+- Temporary files are cleaned up after processing
+- Database access is logged and auditable
+
+### Security Standards
+- Follows OWASP security guidelines
+- Implements defense-in-depth principles
+- Regular security updates and patches
+
+## Security Updates
+
+### Dependency Management
+- Regular updates to Python packages
+- Security-focused dependency monitoring
+- Automated vulnerability detection
+
+### Application Updates
+- Security patches applied promptly
+- Regular security reviews
+- Penetration testing (as needed)
+
+---
+
+For security questions or to report vulnerabilities, please contact the project maintainers through GitHub issues or the project's security contact.
 │  • Hardware Security Modules (HSM)                                │
 │  • Secure Boot & Measured Boot                                    │
 │  • TPM-based Attestation                                          │

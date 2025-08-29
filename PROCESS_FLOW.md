@@ -1,53 +1,197 @@
 # Excel Analyzing - Process Flow Documentation
 
-## 📋 Data Processing Pipeline
+## Data Processing Pipeline
 
-### Overview
+The Excel Analyzing framework processes Excel workbooks through a straightforward pipeline that converts spreadsheet data into structured database format.
 
-The Excel Analyzing framework implements a streamlined data processing pipeline that transforms Excel workbooks into structured database entities through automated analysis, type inference, and data cleaning operations.
+## Processing Flow Overview
 
-### Current Implementation Flow
-
-#### 1. File Ingestion Phase
+### 1. File Discovery and Validation
 
 ```text
-Excel Files (.xlsx, .xls, .xlsm, .xlsb)
-                ↓
-      File Discovery & Validation
-                ↓
-         Format Detection
-                ↓
-      Security Validation
+Input: Excel Files (.xlsx, .xls, .xlsm, .xlsb)
+         ↓
+    File Discovery (recursive directory scanning)
+         ↓
+    File Validation (size, type, accessibility)
+         ↓
+    Security Checks (file extension, size limits)
 ```
 
-**Components Involved:**
-- `excel_analyzing.utils.cleaning.py` - File validation and sanitization
-- `excel_analyzing.pipeline.processor.py` - Format detection and parsing
+**Components:**
+- `ExcelPipeline.discover_workbooks()` - File discovery logic
+- `ExcelPipeline._is_valid_excel_file()` - File validation
+- Configuration limits from `core/config.py`
 
-#### 2. Data Processing Phase
+### 2. Workbook Processing
 
 ```text
-Raw Excel Data
+Valid Excel File
         ↓
-   Sheet Detection
+   Load Workbook Metadata
         ↓
-   Column Analysis
+   Process Each Sheet
         ↓
-   Data Type Inference
+   Extract Column Information
         ↓
-   Data Cleaning
+   Infer Data Types
         ↓
-   Schema Generation
+   Clean and Normalize Data
 ```
 
 **Key Operations:**
-- **Sheet Enumeration**: Identify all worksheets in the workbook
-- **Column Mapping**: Extract column headers and data structure
-- **Type Detection**: Automatic inference of data types (string, integer, float, date, boolean)
-- **Data Sanitization**: Remove empty rows/columns, normalize values
-- **Schema Creation**: Generate Pydantic models for validation
+- **Workbook Loading**: Use openpyxl/xlrd to read Excel files
+- **Sheet Processing**: Identify and process each worksheet
+- **Header Detection**: Automatically detect header rows
+- **Type Inference**: Determine appropriate data types for columns
+- **Data Cleaning**: Remove empty rows/columns, normalize names
 
-#### 3. Database Integration Phase
+**Components:**
+- `ExcelDataProcessor.load_workbook()` - Main processing logic
+- `core/data_types.py` - Type inference utilities
+- `core/cleaning.py` - Data cleaning functions
+
+### 3. Data Storage
+
+```text
+Processed Data
+        ↓
+   Create Database Models
+        ↓
+   Save Workbook Metadata
+        ↓
+   Save Sheet Information
+        ↓
+   Save Column Definitions
+        ↓
+   Record Processing Results
+```
+
+**Database Schema:**
+- **workbooks**: File metadata (name, size, sheet count)
+- **sheets**: Sheet information (name, dimensions, header info)
+- **columns**: Column definitions (name, type, statistics)
+- **processing_results**: Processing logs and results
+
+**Components:**
+- `models/database.py` - SQLAlchemy ORM models
+- `ExcelPipeline._save_workbook_to_database()` - Storage logic
+
+## Processing Options
+
+The pipeline supports various configuration options:
+
+### Data Cleaning Options
+```python
+ProcessingOptions(
+    drop_empty_rows=True,          # Remove completely empty rows
+    drop_empty_columns=True,       # Remove completely empty columns
+    clean_column_names=True,       # Normalize column names
+    null_threshold=0.9,           # Threshold for dropping null columns
+)
+```
+
+### Type Inference Settings
+```python
+ProcessingOptions(
+    infer_data_types=True,        # Enable automatic type detection
+    max_sample_size=100,          # Sample size for type inference
+)
+```
+
+## Error Handling
+
+The pipeline includes comprehensive error handling:
+
+### File-Level Errors
+- Invalid file formats
+- Corrupted files
+- Access permission issues
+- File size limits exceeded
+
+### Processing Errors
+- Sheet parsing failures
+- Data type inference errors
+- Database connection issues
+- Memory limitations
+
+### Recovery Mechanisms
+- Continue processing other files on individual failures
+- Log detailed error information
+- Store partial results when possible
+- Retry logic for transient errors
+
+## Performance Considerations
+
+### Memory Management
+- Process large files in chunks
+- Use generators for memory-efficient iteration
+- Monitor memory usage during processing
+- Configurable memory limits
+
+### Database Optimization
+- Bulk insert operations for large datasets
+- Connection pooling for concurrent access
+- Indexed columns for fast queries
+- Transaction management for data integrity
+
+### Processing Optimization
+- Skip already processed files (optional)
+- Parallel processing for multiple files (future enhancement)
+- Caching of frequently accessed data
+- Progress tracking for long-running operations
+
+## Output and Results
+
+### Processing Results
+Each processing operation returns a `ProcessingResult` object containing:
+- Success/failure status
+- Processed workbook information
+- Error messages (if any)
+- Performance metrics (processing time, rows/columns processed)
+
+### Database Storage
+Processed data is stored in PostgreSQL with:
+- Normalized metadata structure
+- Proper relationships between entities
+- Audit trails for processing operations
+- Support for incremental updates
+
+### Query Interface
+Processed data can be accessed through:
+- REST API endpoints
+- Direct database queries
+- CLI query commands
+- Web interface browsing
+
+## Integration Points
+
+### Command Line Interface
+```bash
+# Process files
+excel-analyze process /path/to/files --recursive
+
+# Query processed data
+excel-analyze query workbook_name sheet_name
+```
+
+### Python API
+```python
+from excel_analyzing.pipeline.orchestrator import ExcelPipeline
+
+pipeline = ExcelPipeline()
+result = pipeline.process_workbook(file_path)
+```
+
+### Web Interface
+- File upload forms
+- Processing status monitoring
+- Data browsing and export
+- Management interfaces
+
+---
+
+This process flow ensures reliable, consistent processing of Excel files while maintaining data quality and providing comprehensive error handling.
 
 ```text
 Cleaned Data + Schema

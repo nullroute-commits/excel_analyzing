@@ -110,41 +110,45 @@ tox -e e2e
 ### Comprehensive Test Suite
 ```bash
 # Run all tests
-tox -e all-tests
+pytest
 
-# Run tests by category
+# Run all tests with coverage
+pytest --cov=excel_analyzing --cov-report=html
+
+# Run tests by category using markers
 pytest -m "integration or security" -v
 
 # Run tests excluding slow ones
 pytest -m "not slow" -v
+
+# Run with specific verbosity
+pytest -v --tb=short
 ```
 
-## CI/CD Integration
+## Test Execution Options
 
-### GitHub Actions Workflows
+### Local Testing
 
-#### Comprehensive Testing Pipeline
-- **File**: `.github/workflows/comprehensive-testing.yml`
-- **Triggers**: Push to main/develop, PRs, nightly schedule
-- **Jobs**:
-  - Quick tests (unit + linting) - matrix across Python versions
-  - Integration tests with database
-  - Security scans and tests
-  - Performance benchmarking
-  - Regression validation
-  - End-to-end testing
-  - Comprehensive reporting
+**Standard Test Run**:
+```bash
+# Quick test run (unit tests only)
+pytest tests/unit/
 
-#### Security Testing Pipeline
-- **File**: `.github/workflows/security-testing.yml`
-- **Triggers**: Push, PRs, daily schedule, manual
-- **Features**:
-  - Dependency vulnerability scanning
-  - Static application security testing
-  - Secret scanning
-  - Dynamic security testing
-  - Container security
-  - Automated security reporting
+# Full test suite
+pytest
+
+# With coverage reporting
+pytest --cov=excel_analyzing --cov-report=term-missing --cov-report=html
+```
+
+**Docker Testing**:
+```bash
+# Run tests in Docker environment
+docker-compose -f docker-compose.test.yml up
+
+# Run specific test services
+docker-compose -f docker-compose.test.yml up web-service
+```
 
 ### Test Configuration
 
