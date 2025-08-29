@@ -1,53 +1,251 @@
-# Comprehensive Testing Infrastructure
+# Testing Infrastructure
 
-This branch implements a comprehensive testing infrastructure for the excel_analyzing project, including integration, regression, security, and performance testing process flows.
+Excel Analyzing includes a comprehensive testing infrastructure designed to ensure code quality, functionality, and performance across all components.
 
-## 🎯 Overview
+## Testing Overview
 
-The testing infrastructure provides multiple layers of validation:
+The testing strategy follows a pyramid approach with multiple layers:
 
 - **Unit Tests**: Fast, isolated component testing
-- **Integration Tests**: Component interaction and workflow testing  
-- **Regression Tests**: Ensure changes don't break existing functionality
-- **Security Tests**: Vulnerability detection and prevention
-- **Performance Tests**: Monitor and maintain performance characteristics
-- **End-to-End Tests**: Complete user workflow validation
+- **Integration Tests**: Component interaction and database testing  
+- **End-to-End Tests**: Complete workflow validation through web interface
+- **Performance Tests**: Performance benchmarking and monitoring
+- **Security Tests**: Security validation and vulnerability detection
+- **Regression Tests**: Baseline comparison to prevent functionality regression
 
-## 📁 Structure
+## Test Structure
 
 ```
 tests/
-├── unit/                          # Unit tests
-│   ├── test_models.py            # Existing unit tests
-│   └── test_processor.py         # Existing unit tests
-├── integration/                   # NEW: Integration tests
-│   ├── test_pipeline_integration.py
-│   └── test_web_integration.py   
-├── regression/                    # NEW: Regression tests
-│   ├── test_regression_suite.py
-│   └── baselines/               # Baseline data storage
-├── security/                      # NEW: Security tests
-│   └── test_security_suite.py
-├── performance/                   # NEW: Performance tests
-│   └── test_performance_suite.py
-├── e2e/                          # NEW: End-to-end tests
-│   └── test_complete_workflow.py
-└── conftest.py                   # NEW: Shared test configuration
+├── unit/                           # Unit tests for individual components
+│   ├── test_models.py             # Pydantic model validation tests
+│   └── test_processor.py          # Data processing logic tests
+├── integration/                    # Integration tests
+│   ├── test_pipeline_integration.py   # Pipeline integration tests
+│   └── test_web_integration.py    # Web interface integration tests
+├── e2e/                           # End-to-end tests
+│   └── test_complete_workflow.py  # Complete user workflow tests
+├── performance/                    # Performance tests
+│   └── test_performance_suite.py  # Performance benchmarking
+├── security/                      # Security tests
+│   └── test_security_suite.py     # Security validation tests
+├── regression/                     # Regression tests
+│   ├── test_regression_suite.py   # Regression test suite
+│   └── baselines/                 # Baseline data for comparison
+└── conftest.py                    # Shared test configuration and fixtures
 ```
 
-## 🚀 Quick Start
+## Running Tests
 
-### Using Docker Compose (Recommended)
+### Quick Start
 
+**Run all tests**:
 ```bash
-# Run unit and integration tests
-docker-compose -f docker-compose.test.yml up web-service
+# Using pytest directly
+pytest
 
-# Run end-to-end tests
-docker-compose -f docker-compose.test.yml up e2e-service
+# With coverage reporting
+pytest --cov=excel_analyzing --cov-report=html
 
-# Run all tests together
+# Using the test runner script
+python run_tests.py --all
+```
+
+**Run specific test categories**:
+```bash
+# Unit tests only
+pytest tests/unit/
+
+# Integration tests only  
+pytest tests/integration/
+
+# Performance tests only
+pytest tests/performance/ -m performance
+
+# End-to-end tests only
+pytest tests/e2e/
+```
+
+### Docker Testing (Recommended)
+
+**Using Docker Compose**:
+```bash
+# Run tests in isolated containers
 docker-compose -f docker-compose.test.yml up
+
+# Run specific test services
+docker-compose -f docker-compose.test.yml up web-service
+docker-compose -f docker-compose.test.yml up e2e-service
+```
+
+### Test Configuration
+
+Tests are configured through `pytest.ini_options` in `pyproject.toml`:
+
+```toml
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "excel_analyzing.web.settings.test"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+testpaths = ["tests"]
+addopts = "--cov=excel_analyzing --cov-report=term-missing --cov-report=html"
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests", 
+    "regression: Regression tests",
+    "security: Security tests",
+    "performance: Performance tests",
+    "e2e: End-to-end tests",
+    "slow: Slow running tests"
+]
+```
+
+## Test Categories
+
+### Unit Tests (`tests/unit/`)
+
+Fast, isolated tests for individual components:
+
+- **Model Tests**: Pydantic schema validation and SQLAlchemy model tests
+- **Processor Tests**: Data processing logic and transformation tests
+- **Core Logic Tests**: Configuration, type inference, and cleaning function tests
+
+**Example Unit Test**:
+```python
+import pytest
+from excel_analyzing.models.schemas import WorkbookInfo
+from pathlib import Path
+
+def test_workbook_info_validation():
+    """Test WorkbookInfo model validation."""
+    # Test valid workbook info
+    workbook = WorkbookInfo(
+        file_path=Path("test.xlsx"),
+        file_name="test.xlsx",
+        file_size_bytes=1024,
+        sheet_count=2
+    )
+    assert workbook.file_name == "test.xlsx"
+    assert workbook.sheet_count == 2
+```
+
+### Integration Tests (`tests/integration/`)
+
+Tests for component interactions and database operations:
+
+- **Pipeline Integration**: Complete processing pipeline tests
+- **Database Integration**: SQLAlchemy model and query tests
+- **Web Integration**: Django view and API endpoint tests
+
+**Example Integration Test**:
+```python
+import pytest
+from excel_analyzing.pipeline.orchestrator import ExcelPipeline
+
+@pytest.mark.integration
+def test_pipeline_processing(sample_excel_file):
+    """Test complete pipeline processing."""
+    pipeline = ExcelPipeline()
+    result = pipeline.process_workbook(sample_excel_file)
+    
+    assert result.success
+    assert result.workbook.sheet_count > 0
+    assert len(result.workbook.sheets) > 0
+```
+
+### End-to-End Tests (`tests/e2e/`)
+
+Complete workflow tests using Playwright for web interface testing:
+
+- **File Upload Workflows**: Test file upload through web interface
+- **Processing Workflows**: Test complete processing through UI
+- **API Workflows**: Test API endpoints with real data
+
+**Example E2E Test**:
+```python
+import pytest
+from playwright.sync_api import Page
+
+@pytest.mark.e2e
+def test_workbook_upload_workflow(page: Page, live_server):
+    """Test complete workbook upload workflow."""
+    page.goto(f"{live_server.url}/upload/")
+    
+    # Upload file
+    page.set_input_files('[data-testid="file-input"]', "test_data/sample.xlsx")
+    page.click('[data-testid="upload-button"]')
+    
+    # Verify processing
+    expect(page.locator('[data-testid="success-message"]')).to_be_visible()
+```
+
+### Performance Tests (`tests/performance/`)
+
+Performance benchmarking and monitoring tests:
+
+- **Processing Performance**: Benchmark file processing speed
+- **Memory Usage**: Monitor memory consumption during processing
+- **Database Performance**: Test query performance and optimization
+
+**Example Performance Test**:
+```python
+import pytest
+from excel_analyzing.pipeline.orchestrator import ExcelPipeline
+
+@pytest.mark.performance
+def test_processing_performance(benchmark, large_excel_file):
+    """Benchmark processing performance."""
+    pipeline = ExcelPipeline()
+    
+    result = benchmark(pipeline.process_workbook, large_excel_file)
+    
+    assert result.success
+    assert result.processing_time_seconds < 30  # Performance threshold
+```
+
+### Security Tests (`tests/security/`)
+
+Security validation and vulnerability detection tests:
+
+- **Input Validation**: Test malicious file handling
+- **Authentication**: Test access control and permissions
+- **Data Sanitization**: Test XSS and injection prevention
+
+**Example Security Test**:
+```python
+import pytest
+from excel_analyzing.core.security import validate_file_upload
+
+@pytest.mark.security  
+def test_malicious_file_rejection():
+    """Test rejection of malicious files."""
+    malicious_file = "tests/security/malicious.exe"
+    
+    with pytest.raises(SecurityError):
+        validate_file_upload(malicious_file)
+```
+
+### Regression Tests (`tests/regression/`)
+
+Baseline comparison tests to prevent functionality regression:
+
+- **Output Validation**: Compare processing results against baselines
+- **API Compatibility**: Ensure API responses remain consistent
+- **Configuration Changes**: Test configuration backward compatibility
+
+**Example Regression Test**:
+```python
+import pytest
+from excel_analyzing.pipeline.orchestrator import ExcelPipeline
+
+@pytest.mark.regression
+def test_processing_output_regression(baseline_data):
+    """Test processing output against baseline."""
+    pipeline = ExcelPipeline()
+    result = pipeline.process_workbook("tests/data/baseline.xlsx")
+    
+    # Compare against stored baseline
+    assert_baseline_match(result.workbook, baseline_data)
+```
 ```
 
 ### Local Development Testing
