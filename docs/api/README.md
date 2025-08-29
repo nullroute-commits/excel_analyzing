@@ -1,427 +1,56 @@
-# Excel Analyzing - Comprehensive RESTful API Specification
+# API Documentation
 
-## Enterprise API Architecture & Design Philosophy
+## REST API Endpoints
 
-The Excel Analyzing RESTful API represents a sophisticated, enterprise-grade application programming interface designed following OpenAPI 3.0 specifications, REST architectural principles, and API-first development methodologies. This comprehensive API provides programmatic access to workbook processing, data analysis, and management capabilities with extensive authentication, authorization, rate limiting, and monitoring features.
+The Excel Analyzing application provides a RESTful API for programmatic access to workbook data and processing capabilities.
 
-### API Design Principles & Standards Compliance
-
-The API implementation adheres to industry best practices and standards:
-
-- **RESTful Architecture**: Full compliance with REST architectural constraints including statelessness, cacheability, and uniform interface
-- **OpenAPI 3.0 Specification**: Complete API documentation with machine-readable schemas, examples, and validation rules
-- **JSON:API Specification**: Consistent response formatting with standardized error handling and pagination
-- **HTTP/2 Protocol Support**: Enhanced performance with multiplexing, server push, and header compression
-- **GraphQL Federation**: Advanced query capabilities with field-level selection and relationship traversal
-- **Semantic Versioning**: API versioning strategy ensuring backward compatibility and graceful deprecation
-
-### Advanced API Gateway & Infrastructure
+### Base URL
 
 ```
-API Infrastructure Topology:
-┌─────────────────────────────────────────────────────────────────────────┐
-│                        API Gateway Cluster (Kong/Zuul)                  │
-│  ┌─────────────────┬─────────────────┬─────────────────┬─────────────────┐ │
-│  │   Load Balancer │  Rate Limiter   │   Auth Gateway  │  Cache Layer    │ │
-│  │  (HAProxy/Nginx)│  (Redis-based)  │  (OAuth 2.0)    │  (Redis/Varnish)│ │
-│  └─────────────────┴─────────────────┴─────────────────┴─────────────────┘ │
-└─────────────────────────┬───────────────────────────────────────────────────┘
-                          │
-        ┌─────────────────┴─────────────────┐
-        │                                   │
-┌───────▼──────────┐                ┌───────▼──────────┐
-│   API Service    │                │ WebSocket Gateway│
-│ (Django REST)    │◄──────────────►│  (Django Channels)│
-├─────────────────┬┤                ├─────────────────┬┤
-│ • REST Endpoints││                │ • Real-time API ││
-│ • GraphQL API   ││                │ • Event Streaming││
-│ • OpenAPI Docs  ││                │ • Subscriptions ││
-│ • Health Checks ││                │ • Notifications ││
-└─────────────────┴┘                └─────────────────┴┘
-        │                                   │
-        └─────────────────┬─────────────────┘
-                          │
-    ┌─────────────────────▼─────────────────────┐
-    │                                           │
-┌───▼────────────┐    ┌────────────────┐    ┌──▼──────────────┐
-│ Business Logic │    │   Data Layer   │    │  External APIs  │
-│   Services     │◄──►│   (Database)   │◄──►│   Integration   │
-│ (Domain Logic) │    │ (PostgreSQL)   │    │  (3rd Party)    │
-└────────────────┘    └────────────────┘    └─────────────────┘
+http://localhost:8000/api/
 ```
 
-### Base URL Configuration & Environment Matrix
+### Authentication
 
-The API supports multiple deployment environments with distinct base URLs and configuration parameters:
-
-| Environment | Base URL | Protocol | Load Balancer | CDN Integration |
-|-------------|----------|----------|---------------|-----------------|
-| **Development** | `http://localhost:8000/api/v1/` | HTTP/1.1 | None | Disabled |
-| **Staging** | `https://staging-api.excel-analyzing.com/api/v1/` | HTTP/2 | AWS ALB | CloudFront |
-| **Production** | `https://api.excel-analyzing.com/api/v1/` | HTTP/2 | Multi-AZ ALB | Global CDN |
-
-#### API Versioning Strategy & Deprecation Policy
-
-```http
-# Version-specific endpoint access patterns
-GET /api/v1/workbooks/          # Version 1.x (Current stable)
-GET /api/v2/workbooks/          # Version 2.x (Latest features)
-GET /api/beta/workbooks/        # Beta features (Unstable)
-
-# Custom headers for version specification
-Accept: application/vnd.excel-analyzing.v1+json
-Accept: application/vnd.excel-analyzing.v2+json
-
-# URL parameter version specification
-GET /api/workbooks/?version=1.0
-GET /api/workbooks/?version=2.0
-```
-
-**Deprecation Timeline**:
-- **Notice Period**: 6 months advance notice for major version deprecation
-- **Support Period**: 12 months parallel support for previous version
-- **End-of-Life**: Complete removal after 18 months from deprecation notice
-
-### Comprehensive Authentication & Authorization Framework
-
-#### Multi-Factor Authentication & Token Management
-
-The API implements a sophisticated authentication system supporting multiple authentication methods with comprehensive security features:
-
-```python
-# Authentication Configuration Matrix
-AUTHENTICATION_METHODS = {
-    "oauth2": {
-        "provider": "OAuth 2.0 / OpenID Connect",
-        "grant_types": ["authorization_code", "client_credentials", "refresh_token"],
-        "token_endpoint": "/api/auth/token/",
-        "authorization_endpoint": "/api/auth/authorize/",
-        "userinfo_endpoint": "/api/auth/userinfo/",
-        "jwks_endpoint": "/api/auth/.well-known/jwks.json",
-        "scopes": ["read", "write", "admin", "analytics"],
-        "token_lifetime": 3600,  # 1 hour
-        "refresh_token_lifetime": 2592000,  # 30 days
-        "pkce_required": True,  # Proof Key for Code Exchange
-        "state_required": True,  # CSRF protection
-    },
-    "jwt": {
-        "provider": "JSON Web Tokens",
-        "algorithm": "RS256",  # RSA-SHA256 signature
-        "public_key_endpoint": "/api/auth/.well-known/public-key.pem",
-        "issuer": "https://api.excel-analyzing.com",
-        "audience": "excel-analyzing-api",
-        "leeway": 30,  # Clock skew tolerance in seconds
-        "verify_signature": True,
-        "verify_expiration": True,
-        "verify_not_before": True,
-        "require_issued_at": True,
-    },
-    "api_key": {
-        "provider": "API Key Authentication",
-        "header_name": "X-API-Key",
-        "key_format": "ea_[a-zA-Z0-9]{32}",  # Prefixed random string
-        "rate_limit_per_key": 1000,  # Requests per hour
-        "rotation_period": 90,  # Days before rotation recommended
-        "revocation_enabled": True,
-        "usage_tracking": True,
-    },
-    "session": {
-        "provider": "Django Session Authentication",
-        "session_engine": "redis",
-        "session_timeout": 3600,  # 1 hour
-        "csrf_protection": True,
-        "secure_cookies": True,
-        "httponly_cookies": True,
-        "samesite_strict": True,
-    }
-}
-
-# Rate Limiting Configuration
-RATE_LIMITING = {
-    "global": {
-        "requests_per_minute": 1000,
-        "requests_per_hour": 10000,
-        "requests_per_day": 100000,
-        "burst_limit": 50,  # Burst allowance
-    },
-    "authenticated": {
-        "requests_per_minute": 500,
-        "requests_per_hour": 5000,
-        "requests_per_day": 50000,
-        "burst_limit": 25,
-    },
-    "unauthenticated": {
-        "requests_per_minute": 100,
-        "requests_per_hour": 1000,
-        "requests_per_day": 5000,
-        "burst_limit": 10,
-    },
-    "premium": {
-        "requests_per_minute": 2000,
-        "requests_per_hour": 20000,
-        "requests_per_day": 200000,
-        "burst_limit": 100,
-    }
-}
-```
-
-#### OAuth 2.0 Flow Implementation Example
+All API endpoints require authentication. Use Django's built-in authentication system or API tokens.
 
 ```bash
-# Step 1: Authorization Request
-curl -X GET "https://api.excel-analyzing.com/api/auth/authorize/" \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "response_type=code" \
-  -d "client_id=your_client_id" \
-  -d "redirect_uri=https://yourapp.com/callback" \
-  -d "scope=read write analytics" \
-  -d "state=random_state_string" \
-  -d "code_challenge=BASE64URL(SHA256(code_verifier))" \
-  -d "code_challenge_method=S256"
+# Example with session authentication
+curl -H "Content-Type: application/json" \
+     -H "Cookie: sessionid=your-session-id" \
+     http://localhost:8000/api/workbooks/
 
-# Step 2: Token Exchange
-curl -X POST "https://api.excel-analyzing.com/api/auth/token/" \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "grant_type=authorization_code" \
-  -d "code=authorization_code_from_step1" \
-  -d "redirect_uri=https://yourapp.com/callback" \
-  -d "client_id=your_client_id" \
-  -d "client_secret=your_client_secret" \
-  -d "code_verifier=original_code_verifier"
-
-# Response:
-{
-  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "Bearer",
-  "expires_in": 3600,
-  "refresh_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "scope": "read write analytics",
-  "created_at": 1640995200
-}
-
-# Step 3: API Usage with Bearer Token
-curl -X GET "https://api.excel-analyzing.com/api/v1/workbooks/" \
-  -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..." \
-  -H "Accept: application/vnd.excel-analyzing.v1+json"
+# Example with token authentication (if configured)
+curl -H "Content-Type: application/json" \
+     -H "Authorization: Token your-api-token" \
+     http://localhost:8000/api/workbooks/
 ```
 
-## Comprehensive API Endpoints Documentation
+### Endpoints
 
-### Workbook Management API
+#### Workbooks
 
-#### Advanced Workbook Listing with Complex Filtering
-
+##### List Workbooks
 ```http
-GET /api/v1/workbooks/
+GET /api/workbooks/
 ```
 
-**Advanced Query Parameters**:
-| Parameter | Type | Description | Example Values | Validation Rules |
-|-----------|------|-------------|----------------|------------------|
-| `page` | Integer | Pagination page number | `1`, `2`, `10` | Min: 1, Max: 1000 |
-| `page_size` | Integer | Items per page | `10`, `25`, `50`, `100` | Min: 1, Max: 100 |
-| `search` | String | Full-text search query | `"sales data"`, `"Q1 2024"` | Max length: 255 chars |
-| `ordering` | String | Sort field and direction | `created_at`, `-file_size` | Allowed fields list |
-| `file_name__icontains` | String | Case-insensitive filename filter | `"sales"`, `"report"` | Regex validation |
-| `file_size__gte` | Integer | Minimum file size in bytes | `1048576` (1MB) | Positive integer |
-| `file_size__lte` | Integer | Maximum file size in bytes | `104857600` (100MB) | Positive integer |
-| `created_at__gte` | DateTime | Created after timestamp | `2024-01-01T00:00:00Z` | ISO 8601 format |
-| `created_at__lte` | DateTime | Created before timestamp | `2024-12-31T23:59:59Z` | ISO 8601 format |
-| `status` | Enum | Processing status filter | `completed`, `processing` | Predefined enum |
-| `user_id` | UUID | Filter by user ID | `550e8400-e29b-41d4-a716-446655440000` | Valid UUID v4 |
-| `sheet_count__gte` | Integer | Minimum sheet count | `1`, `5`, `10` | Positive integer |
-| `has_errors` | Boolean | Filter workbooks with errors | `true`, `false` | Boolean validation |
-| `quality_rating` | Enum | Data quality filter | `excellent`, `good`, `fair` | Quality enum |
-| `tags` | Array | Filter by tags | `["financial", "quarterly"]` | Max 10 tags |
-
-**Comprehensive Response Schema**:
+**Response:**
 ```json
 {
-  "pagination": {
-    "count": 1247,
-    "pages": 125,
-    "current_page": 1,
-    "page_size": 10,
-    "has_next": true,
-    "has_previous": false,
-    "next_url": "https://api.excel-analyzing.com/api/v1/workbooks/?page=2",
-    "previous_url": null
-  },
-  "facets": {
-    "status_counts": {
-      "completed": 1156,
-      "processing": 23,
-      "failed": 68
-    },
-    "quality_distribution": {
-      "excellent": 412,
-      "good": 587,
-      "fair": 189,
-      "poor": 59
-    },
-    "file_size_ranges": {
-      "small": 623,      // < 1MB
-      "medium": 498,     // 1MB - 10MB
-      "large": 126       // > 10MB
-    }
-  },
+  "count": 2,
+  "next": null,
+  "previous": null,
   "results": [
     {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "file_name": "Q1_2024_Sales_Analysis.xlsx",
-      "file_path": "/uploads/2024/01/Q1_2024_Sales_Analysis.xlsx",
-      "file_size_bytes": 2485760,
-      "file_size_human": "2.4 MB",
-      "mime_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "checksum_md5": "d41d8cd98f00b204e9800998ecf8427e",
-      "checksum_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "sheet_count": 5,
-      "total_rows": 12847,
-      "total_columns": 23,
-      "status": "completed",
-      "quality_rating": "good",
-      "processing_metrics": {
-        "processing_time_seconds": 142.5,
-        "memory_usage_mb": 67.3,
-        "rows_processed": 12847,
-        "columns_processed": 115,
-        "errors_count": 0,
-        "warnings_count": 3
-      },
-      "metadata": {
-        "created_by": {
-          "id": "123e4567-e89b-12d3-a456-426614174000",
-          "username": "john.analyst",
-          "display_name": "John Analyst"
-        },
-        "tags": ["financial", "quarterly", "sales"],
-        "description": "Q1 2024 sales performance analysis with regional breakdown",
-        "business_unit": "Sales Analytics",
-        "confidentiality_level": "internal"
-      },
-      "timestamps": {
-        "created_at": "2024-01-15T10:30:00.123456Z",
-        "updated_at": "2024-01-15T10:32:45.789012Z",
-        "processed_at": "2024-01-15T10:32:15.456789Z",
-        "last_accessed": "2024-01-16T14:22:33.987654Z"
-      },
-      "urls": {
-        "self": "https://api.excel-analyzing.com/api/v1/workbooks/550e8400-e29b-41d4-a716-446655440000/",
-        "sheets": "https://api.excel-analyzing.com/api/v1/workbooks/550e8400-e29b-41d4-a716-446655440000/sheets/",
-        "download": "https://api.excel-analyzing.com/api/v1/workbooks/550e8400-e29b-41d4-a716-446655440000/download/",
-        "analysis": "https://api.excel-analyzing.com/api/v1/workbooks/550e8400-e29b-41d4-a716-446655440000/analysis/"
-      }
+      "id": 1,
+      "file_name": "sales_data.xlsx",
+      "file_size_bytes": 1048576,
+      "sheet_count": 3,
+      "created_at": "2024-01-15T10:30:00Z",
+      "processed_at": "2024-01-15T10:32:15Z"
     }
-  ],
-  "links": {
-    "self": "https://api.excel-analyzing.com/api/v1/workbooks/?page=1",
-    "first": "https://api.excel-analyzing.com/api/v1/workbooks/?page=1",
-    "last": "https://api.excel-analyzing.com/api/v1/workbooks/?page=125",
-    "next": "https://api.excel-analyzing.com/api/v1/workbooks/?page=2",
-    "previous": null
-  },
-  "meta": {
-    "api_version": "1.0",
-    "request_id": "req_123e4567e89b12d3a456426614174000",
-    "response_time_ms": 45,
-    "cached": false,
-    "total_query_time_ms": 23
-  }
-}
-```
-
-#### Advanced Workbook Upload with Processing Options
-
-```http
-POST /api/v1/workbooks/
-Content-Type: multipart/form-data
-```
-
-**Request Parameters**:
-```bash
-curl -X POST "https://api.excel-analyzing.com/api/v1/workbooks/" \
-  -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..." \
-  -H "Content-Type: multipart/form-data" \
-  -F "file=@/path/to/sales_data.xlsx" \
-  -F "processing_options='{
-    "drop_empty_rows": true,
-    "drop_empty_columns": true,
-    "infer_data_types": true,
-    "clean_column_names": true,
-    "null_threshold": 0.9,
-    "max_sample_size": 10000,
-    "enable_quality_assessment": true,
-    "generate_statistics": true,
-    "create_data_dictionary": true,
-    "enable_profiling": true
-  }'" \
-  -F "metadata='{
-    "description": "Monthly sales report with regional breakdown",
-    "tags": ["sales", "monthly", "regional"],
-    "business_unit": "Sales Analytics",
-    "confidentiality_level": "internal",
-    "retention_period_days": 2555,
-    "notify_on_completion": true,
-    "notification_emails": ["analyst@company.com"]
-  }'" \
-  -F "validation_options='{
-    "strict_validation": true,
-    "schema_validation": true,
-    "data_integrity_checks": true,
-    "duplicate_detection": true,
-    "anomaly_detection": true,
-    "compliance_checks": ["gdpr", "ccpa"]
-  }'"
-```
-
-**Upload Response with Processing Status**:
-```json
-{
-  "workbook": {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "file_name": "sales_data.xlsx",
-    "status": "uploading",
-    "upload_session_id": "upload_789e1234-e56f-78a9-0123-456789abcdef",
-    "estimated_processing_time_seconds": 180,
-    "processing_queue_position": 3
-  },
-  "upload_info": {
-    "bytes_uploaded": 2485760,
-    "total_bytes": 2485760,
-    "upload_percentage": 100.0,
-    "upload_speed_bps": 1048576,
-    "chunks_uploaded": 1,
-    "total_chunks": 1
-  },
-  "processing_options": {
-    "drop_empty_rows": true,
-    "drop_empty_columns": true,
-    "infer_data_types": true,
-    "clean_column_names": true,
-    "null_threshold": 0.9,
-    "max_sample_size": 10000,
-    "enable_quality_assessment": true,
-    "generate_statistics": true,
-    "create_data_dictionary": true,
-    "enable_profiling": true
-  },
-  "validation_results": {
-    "file_format_valid": true,
-    "file_size_acceptable": true,
-    "virus_scan_clean": true,
-    "metadata_complete": true,
-    "permissions_valid": true
-  },
-  "next_steps": {
-    "polling_url": "https://api.excel-analyzing.com/api/v1/workbooks/550e8400-e29b-41d4-a716-446655440000/status/",
-    "webhook_url": "https://api.excel-analyzing.com/api/v1/webhooks/processing/",
-    "websocket_url": "wss://api.excel-analyzing.com/ws/workbooks/550e8400-e29b-41d4-a716-446655440000/"
-  },
-  "meta": {
-    "request_id": "req_456f7890a123b456c789012345678901",
-    "api_version": "1.0",
-    "processing_started_at": "2024-01-15T10:30:00.123456Z"
-  }
+  ]
 }
 ```
 
@@ -435,55 +64,44 @@ GET /api/workbooks/{id}/
 {
   "id": 1,
   "file_name": "sales_data.xlsx",
-  "file_path": "/path/to/sales_data.xlsx",
+  "file_path": "/uploads/sales_data.xlsx",
   "file_size_bytes": 1048576,
   "sheet_count": 3,
-  "created_at": "2024-01-15T10:30:00Z",
-  "processed_at": "2024-01-15T10:32:15Z",
   "sheets": [
     {
       "id": 1,
-      "name": "sales_summary",
-      "original_name": "Sales Summary",
+      "name": "Summary",
       "row_count": 1000,
-      "column_count": 8,
-      "has_header": true,
-      "header_row": 0,
-      "data_start_row": 1
+      "column_count": 10
     }
-  ]
+  ],
+  "created_at": "2024-01-15T10:30:00Z",
+  "processed_at": "2024-01-15T10:32:15Z"
 }
 ```
 
 ##### Upload and Process Workbook
 ```http
 POST /api/workbooks/
+Content-Type: multipart/form-data
 ```
 
 **Request:**
-```json
-{
-  "file": "base64_encoded_file_content",
-  "processing_options": {
-    "drop_empty_rows": true,
-    "drop_empty_columns": true,
-    "clean_column_names": true,
-    "null_threshold": 0.9
-  }
-}
+```bash
+curl -X POST \
+  -F "file=@sales_data.xlsx" \
+  -F "processing_options={\"drop_empty_rows\": true, \"clean_column_names\": true}" \
+  http://localhost:8000/api/workbooks/
 ```
 
 **Response:**
 ```json
 {
   "id": 2,
-  "file_name": "uploaded_data.xlsx",
-  "processing_result": {
-    "success": true,
-    "rows_processed": 5000,
-    "columns_processed": 25,
-    "processing_time_seconds": 2.45
-  }
+  "file_name": "sales_data.xlsx",
+  "file_size_bytes": 1048576,
+  "processing_status": "processing",
+  "created_at": "2024-01-15T10:30:00Z"
 }
 ```
 
@@ -497,23 +115,24 @@ GET /api/workbooks/{workbook_id}/sheets/
 **Response:**
 ```json
 {
+  "count": 3,
   "results": [
     {
       "id": 1,
-      "name": "sales_summary",
-      "original_name": "Sales Summary",
+      "name": "Summary",
+      "workbook_id": 1,
       "row_count": 1000,
-      "column_count": 8,
-      "has_header": true,
+      "column_count": 10,
       "columns": [
         {
-          "id": 1,
           "name": "product_name",
-          "original_name": "Product Name",
           "data_type": "string",
-          "position": 0,
-          "null_count": 0,
-          "unique_count": 250
+          "position": 0
+        },
+        {
+          "name": "revenue",
+          "data_type": "float",
+          "position": 1
         }
       ]
     }
@@ -526,49 +145,53 @@ GET /api/workbooks/{workbook_id}/sheets/
 GET /api/sheets/{id}/data/
 ```
 
-**Parameters:**
-- `limit` (int): Number of rows to return (default: 100, max: 1000)
-- `offset` (int): Number of rows to skip
-- `columns` (string): Comma-separated list of columns to include
-- `filter` (string): Pandas query filter expression
+**Query Parameters:**
+- `limit`: Number of rows to return (default: 100)
+- `offset`: Number of rows to skip (default: 0)
+- `filter`: Column filtering (e.g., `revenue__gt=1000`)
+- `sort`: Sort by column (e.g., `revenue` or `-revenue` for descending)
 
 **Response:**
 ```json
 {
   "count": 1000,
-  "columns": ["product_name", "sales_amount", "date"],
+  "next": "http://localhost:8000/api/sheets/1/data/?offset=100",
+  "previous": null,
   "data": [
     {
       "product_name": "Widget A",
-      "sales_amount": 150.50,
+      "revenue": 1500.00,
       "date": "2024-01-15"
     }
   ],
-  "meta": {
-    "data_types": {
-      "product_name": "string",
-      "sales_amount": "float",
-      "date": "date"
+  "columns": [
+    {
+      "name": "product_name",
+      "data_type": "string"
+    },
+    {
+      "name": "revenue", 
+      "data_type": "float"
     }
-  }
+  ]
 }
 ```
 
 ##### Query Sheet Data
 ```http
 POST /api/sheets/{id}/query/
+Content-Type: application/json
 ```
 
 **Request:**
 ```json
 {
-  "filter": "sales_amount > 100",
-  "columns": ["product_name", "sales_amount"],
-  "aggregation": {
-    "operation": "group_by",
-    "columns": ["product_name"],
-    "agg_func": "sum"
+  "select": ["product_name", "revenue"],
+  "where": {
+    "revenue__gt": 1000,
+    "date__gte": "2024-01-01"
   },
+  "order_by": ["-revenue"],
   "limit": 50
 }
 ```
@@ -576,20 +199,13 @@ POST /api/sheets/{id}/query/
 **Response:**
 ```json
 {
-  "query": {
-    "filter": "sales_amount > 100",
-    "columns": ["product_name", "sales_amount"],
-    "execution_time_ms": 45
-  },
-  "results": {
-    "count": 25,
-    "data": [
-      {
-        "product_name": "Widget A",
-        "sales_amount": 1250.75
-      }
-    ]
-  }
+  "data": [
+    {
+      "product_name": "Widget A",
+      "revenue": 1500.00
+    }
+  ],
+  "count": 25
 }
 ```
 
@@ -621,7 +237,8 @@ GET /api/processing/{workbook_id}/status/
 
 ##### Reprocess Workbook
 ```http
-POST /api/workbooks/{id}/reprocess/
+POST /api/processing/{workbook_id}/reprocess/
+Content-Type: application/json
 ```
 
 **Request:**
@@ -629,55 +246,100 @@ POST /api/workbooks/{id}/reprocess/
 {
   "processing_options": {
     "drop_empty_rows": true,
-    "drop_empty_columns": false,
     "clean_column_names": true,
-    "null_threshold": 0.8
+    "infer_data_types": true,
+    "null_threshold": 0.9
   }
+}
+```
+
+**Response:**
+```json
+{
+  "workbook_id": 1,
+  "status": "processing",
+  "message": "Reprocessing started"
 }
 ```
 
 ### Error Responses
 
-All endpoints return appropriate HTTP status codes and error messages:
+All API endpoints return standard HTTP status codes with detailed error information:
 
-#### 400 Bad Request
+#### Validation Errors (400 Bad Request)
 ```json
 {
-  "error": "Invalid request",
+  "error": "Validation failed",
   "details": {
-    "processing_options": ["null_threshold must be between 0 and 1"]
+    "field_name": ["This field is required."],
+    "another_field": ["Invalid value."]
   }
 }
 ```
 
-#### 404 Not Found
+#### Authentication Errors (401 Unauthorized)
 ```json
 {
-  "error": "Workbook not found",
-  "message": "No workbook with ID 999"
+  "error": "Authentication required",
+  "message": "Please provide valid authentication credentials."
 }
 ```
 
-#### 500 Internal Server Error
+#### Permission Errors (403 Forbidden)
+```json
+{
+  "error": "Permission denied",
+  "message": "You do not have permission to access this resource."
+}
+```
+
+#### Not Found Errors (404 Not Found)
+```json
+{
+  "error": "Resource not found",
+  "message": "The requested workbook does not exist."
+}
+```
+
+#### Server Errors (500 Internal Server Error)
 ```json
 {
   "error": "Internal server error",
-  "message": "Failed to process workbook"
+  "message": "An unexpected error occurred. Please try again later.",
+  "request_id": "abc-123-def-456"
 }
 ```
 
 ### Rate Limiting
 
-API endpoints are rate-limited to prevent abuse:
-- Authenticated users: 1000 requests per hour
-- Anonymous users: 100 requests per hour
+API requests are rate-limited to prevent abuse:
+
+- **Authenticated users**: 1000 requests per hour
+- **Unauthenticated users**: 100 requests per hour
+
+Rate limit headers are included in responses:
+```http
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 999
+X-RateLimit-Reset: 1642262400
+```
 
 ### Pagination
 
-List endpoints support pagination using limit/offset:
-- Default page size: 20
-- Maximum page size: 100
-- Use `next` and `previous` URLs for navigation
+List endpoints use cursor-based pagination:
+
+```json
+{
+  "count": 1000,
+  "next": "http://localhost:8000/api/workbooks/?offset=20",
+  "previous": "http://localhost:8000/api/workbooks/?offset=0",
+  "results": []
+}
+```
+
+**Query Parameters:**
+- `limit`: Number of items per page (default: 20, max: 100)
+- `offset`: Number of items to skip
 
 ### Data Export
 
@@ -696,21 +358,266 @@ GET /api/sheets/{id}/export/?format=json
 GET /api/workbooks/{id}/export/?format=json
 ```
 
-### WebSocket Events
+### Health Check
 
-Real-time updates are available via WebSocket connections:
+Check API health and status:
 
-```javascript
-const ws = new WebSocket('ws://localhost:8000/ws/processing/');
-
-ws.onmessage = function(event) {
-    const data = JSON.parse(event.data);
-    console.log('Processing update:', data);
-};
+```http
+GET /api/health/
 ```
 
-**Event Types:**
-- `processing.started`: Processing has begun
-- `processing.progress`: Progress update with percentage
-- `processing.completed`: Processing finished successfully
-- `processing.failed`: Processing failed with error details
+**Response:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "version": "1.0.0",
+  "services": {
+    "database": "healthy",
+    "cache": "healthy"
+  }
+}
+```
+
+## Examples
+
+### Complete Processing Workflow
+
+```python
+import requests
+import time
+
+base_url = "http://localhost:8000/api"
+headers = {"Authorization": "Token your-api-token"}
+
+# 1. Upload workbook
+with open("sales_data.xlsx", "rb") as f:
+    files = {"file": f}
+    response = requests.post(f"{base_url}/workbooks/", files=files, headers=headers)
+    workbook = response.json()
+
+# 2. Monitor processing
+workbook_id = workbook["id"]
+while True:
+    response = requests.get(f"{base_url}/processing/{workbook_id}/status/", headers=headers)
+    status = response.json()
+    
+    if status["status"] == "completed":
+        print("Processing completed!")
+        break
+    elif status["status"] == "failed":
+        print(f"Processing failed: {status['results']['error_message']}")
+        break
+    
+    time.sleep(5)  # Wait 5 seconds
+
+# 3. Get processed data
+response = requests.get(f"{base_url}/workbooks/{workbook_id}/sheets/", headers=headers)
+sheets = response.json()["results"]
+
+for sheet in sheets:
+    response = requests.get(f"{base_url}/sheets/{sheet['id']}/data/", headers=headers)
+    data = response.json()
+    print(f"Sheet: {sheet['name']}, Rows: {data['count']}")
+```
+
+### Filtering and Querying
+
+```python
+# Query sheet data with filters
+query = {
+    "select": ["product_name", "revenue", "date"],
+    "where": {
+        "revenue__gt": 1000,
+        "date__gte": "2024-01-01",
+        "product_name__icontains": "widget"
+    },
+    "order_by": ["-revenue", "date"],
+    "limit": 50
+}
+
+response = requests.post(
+    f"{base_url}/sheets/{sheet_id}/query/",
+    json=query,
+    headers=headers
+)
+results = response.json()
+```
+
+### Batch Operations
+
+```python
+# Process multiple workbooks
+workbook_files = ["file1.xlsx", "file2.xlsx", "file3.xlsx"]
+workbook_ids = []
+
+for file_path in workbook_files:
+    with open(file_path, "rb") as f:
+        files = {"file": f}
+        response = requests.post(f"{base_url}/workbooks/", files=files, headers=headers)
+        workbook_ids.append(response.json()["id"])
+
+# Monitor all processing jobs
+while workbook_ids:
+    completed = []
+    for workbook_id in workbook_ids:
+        response = requests.get(f"{base_url}/processing/{workbook_id}/status/", headers=headers)
+        status = response.json()
+        
+        if status["status"] in ["completed", "failed"]:
+            completed.append(workbook_id)
+            print(f"Workbook {workbook_id}: {status['status']}")
+    
+    for workbook_id in completed:
+        workbook_ids.remove(workbook_id)
+    
+    if workbook_ids:
+        time.sleep(10)
+```
+
+### Error Handling
+
+```python
+def safe_api_call(url, method="GET", **kwargs):
+    """Make API call with proper error handling."""
+    try:
+        if method == "GET":
+            response = requests.get(url, **kwargs)
+        elif method == "POST":
+            response = requests.post(url, **kwargs)
+        
+        response.raise_for_status()
+        return response.json()
+        
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 400:
+            print(f"Validation error: {e.response.json()}")
+        elif e.response.status_code == 401:
+            print("Authentication required")
+        elif e.response.status_code == 403:
+            print("Permission denied")
+        elif e.response.status_code == 404:
+            print("Resource not found")
+        elif e.response.status_code == 429:
+            print("Rate limit exceeded")
+        else:
+            print(f"API error: {e}")
+        return None
+        
+    except requests.exceptions.RequestException as e:
+        print(f"Network error: {e}")
+        return None
+
+# Usage
+workbooks = safe_api_call(f"{base_url}/workbooks/", headers=headers)
+if workbooks:
+    print(f"Found {workbooks['count']} workbooks")
+```
+
+## Common Use Cases
+
+### Data Validation and Quality Assessment
+
+```python
+# Upload and analyze data quality
+response = requests.post(
+    f"{base_url}/workbooks/",
+    files={"file": open("data.xlsx", "rb")},
+    data={"processing_options": json.dumps({
+        "drop_empty_rows": True,
+        "clean_column_names": True,
+        "infer_data_types": True,
+        "null_threshold": 0.8
+    })},
+    headers=headers
+)
+
+workbook_id = response.json()["id"]
+
+# Get data quality report
+response = requests.get(f"{base_url}/workbooks/{workbook_id}/", headers=headers)
+workbook = response.json()
+
+print(f"Data Quality Summary:")
+print(f"- Total sheets: {workbook['sheet_count']}")
+for sheet in workbook['sheets']:
+    print(f"- Sheet '{sheet['name']}': {sheet['row_count']} rows, {sheet['column_count']} columns")
+```
+
+### Data Integration and ETL
+
+```python
+# Extract data from multiple workbooks
+source_workbooks = [1, 2, 3]  # Workbook IDs
+consolidated_data = []
+
+for workbook_id in source_workbooks:
+    # Get all sheets from workbook
+    response = requests.get(f"{base_url}/workbooks/{workbook_id}/sheets/", headers=headers)
+    sheets = response.json()["results"]
+    
+    for sheet in sheets:
+        # Extract data with specific filters
+        query = {
+            "select": ["date", "revenue", "region"],
+            "where": {"date__gte": "2024-01-01"},
+            "limit": 10000
+        }
+        
+        response = requests.post(
+            f"{base_url}/sheets/{sheet['id']}/query/",
+            json=query,
+            headers=headers
+        )
+        
+        data = response.json()["data"]
+        consolidated_data.extend(data)
+
+print(f"Consolidated {len(consolidated_data)} records from {len(source_workbooks)} workbooks")
+```
+
+### Automated Reporting
+
+```python
+import pandas as pd
+
+def generate_summary_report(workbook_id):
+    """Generate summary report for a workbook."""
+    # Get workbook details
+    response = requests.get(f"{base_url}/workbooks/{workbook_id}/", headers=headers)
+    workbook = response.json()
+    
+    report = {
+        "workbook_name": workbook["file_name"],
+        "total_sheets": workbook["sheet_count"],
+        "sheets": []
+    }
+    
+    for sheet_info in workbook["sheets"]:
+        # Get sheet data for analysis
+        response = requests.get(f"{base_url}/sheets/{sheet_info['id']}/data/?limit=1000", headers=headers)
+        sheet_data = response.json()
+        
+        # Basic statistics
+        df = pd.DataFrame(sheet_data["data"])
+        sheet_summary = {
+            "name": sheet_info["name"],
+            "total_rows": sheet_data["count"],
+            "columns": len(sheet_data["columns"]),
+            "numeric_columns": len([col for col in sheet_data["columns"] if col["data_type"] in ["float", "integer"]]),
+            "sample_data": sheet_data["data"][:5]  # First 5 rows
+        }
+        
+        report["sheets"].append(sheet_summary)
+    
+    return report
+
+# Generate reports for multiple workbooks
+workbook_ids = [1, 2, 3]
+reports = []
+
+for workbook_id in workbook_ids:
+    report = generate_summary_report(workbook_id)
+    reports.append(report)
+    print(f"Generated report for {report['workbook_name']}")
+```
