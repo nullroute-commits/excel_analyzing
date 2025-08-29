@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Excel Analyzing{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">📂 Upload Excel Workbook</h2>
+            </div>
+            <div class="card-body">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="fileInput" class="form-label">Choose Excel File</label>
+                        <input type="file" class="form-control" id="fileInput" name="file" 
+                               accept=".xlsx,.xls,.csv" required>
+                        <div class="form-text">
+                            Supported formats: Excel (.xlsx, .xls) and CSV (.csv)
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="nameInput" class="form-label">Workbook Name (Optional)</label>
+                        <input type="text" class="form-control" id="nameInput" name="name" 
+                               placeholder="Leave empty to use filename">
+                        <div class="form-text">
+                            A custom name for your workbook. If left empty, the filename will be used.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="analyzeCheck" name="analyze" checked>
+                            <label class="form-check-label" for="analyzeCheck">
+                                Perform automatic analysis
+                            </label>
+                        </div>
+                        <div class="form-text">
+                            Automatically analyze data types, generate schema, and perform quality checks.
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'workbooks:workbook_list' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="uploadBtn">
+                            🚀 Upload & Analyze
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Upload Progress -->
+                <div id="uploadProgress" class="mt-3" style="display: none;">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <small class="text-muted mt-1 d-block">Uploading and processing your file...</small>
+                </div>
+
+                <!-- Success/Error Messages -->
+                <div id="uploadMessage" class="mt-3" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">💡 What happens after upload?</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>📊 Data Analysis</h6>
+                        <ul class="list-unstyled">
+                            <li>✅ Column type detection</li>
+                            <li>✅ Data quality assessment</li>
+                            <li>✅ Missing values analysis</li>
+                            <li>✅ Statistical summaries</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>🔍 Schema Generation</h6>
+                        <ul class="list-unstyled">
+                            <li>✅ Column normalization</li>
+                            <li>✅ Relationship detection</li>
+                            <li>✅ Constraint identification</li>
+                            <li>✅ Export-ready format</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">🔗 API Upload</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">You can also upload files programmatically using our REST API:</p>
+                <code class="d-block bg-light p-2 rounded">
+                    curl -X POST -H "Content-Type: multipart/form-data" \<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;-F "file=@your_file.xlsx" \<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;http://localhost:8000/api/workbooks/
+                </code>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const uploadMessage = document.getElementById('uploadMessage');
+    
+    if (!fileInput.files[0]) {
+        alert('Please select a file to upload.');
+        return;
+    }
+    
+    // Show progress, disable button
+    uploadBtn.disabled = true;
+    uploadBtn.innerHTML = '⏳ Uploading...';
+    uploadProgress.style.display = 'block';
+    uploadMessage.style.display = 'none';
+    
+    // Simulate upload progress (in real implementation, you'd track actual progress)
+    let progress = 0;
+    const progressBar = document.querySelector('.progress-bar');
+    const progressInterval = setInterval(() => {
+        progress += 10;
+        progressBar.style.width = progress + '%';
+        if (progress >= 90) {
+            clearInterval(progressInterval);
+        }
+    }, 200);
+    
+    // Submit to API endpoint
+    fetch('/api/workbooks/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => {
+        clearInterval(progressInterval);
+        progressBar.style.width = '100%';
+        
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error('Upload failed');
+    })
+    .then(data => {
+        uploadMessage.innerHTML = `
+            <div class="alert alert-success">
+                <h6>✅ Upload successful!</h6>
+                <p>Your workbook has been uploaded and is being processed.</p>
+                <a href="/workbooks/${data.id}/" class="btn btn-success btn-sm">View Workbook</a>
+            </div>
+        `;
+        uploadMessage.style.display = 'block';
+        
+        // Reset form after success
+        setTimeout(() => {
+            window.location.href = `/workbooks/${data.id}/`;
+        }, 2000);
+    })
+    .catch(error => {
+        uploadMessage.innerHTML = `
+            <div class="alert alert-danger">
+                <h6>❌ Upload failed</h6>
+                <p>There was an error uploading your file. Please try again.</p>
+                <small class="text-muted">Error: ${error.message}</small>
+            </div>
+        `;
+        uploadMessage.style.display = 'block';
+    })
+    .finally(() => {
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = '🚀 Upload & Analyze';
+        setTimeout(() => {
+            uploadProgress.style.display = 'none';
+        }, 1000);
+    });
+});
+
+// File input change handler
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file && !document.getElementById('nameInput').value) {
+        // Auto-fill name from filename
+        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+        document.getElementById('nameInput').value = nameWithoutExt;
+    }
+});
+</script>
+{% endblock %}

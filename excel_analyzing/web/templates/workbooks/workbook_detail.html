@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Excel Analyzing{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">📄 {{ workbook.file_name }}</h2>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'workbooks:workbook_list' %}" class="btn btn-outline-secondary">
+                        ← Back to List
+                    </a>
+                    <a href="/api/workbooks/{{ workbook.pk }}/" class="btn btn-outline-primary">
+                        🔗 API View
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>📊 Basic Information</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>File Name:</strong></td>
+                                <td>{{ workbook.file_name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Created:</strong></td>
+                                <td>{{ workbook.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Updated:</strong></td>
+                                <td>{{ workbook.updated_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            {% if workbook.file_size %}
+                            <tr>
+                                <td><strong>File Size:</strong></td>
+                                <td>{{ workbook.file_size|filesizeformat }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if workbook.sheet_count %}
+                            <tr>
+                                <td><strong>Sheets:</strong></td>
+                                <td>{{ workbook.sheet_count }}</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>🔍 Processing Status</h5>
+                        <div class="badge bg-primary mb-2">
+                            Status: {{ workbook.status|default:"Uploaded" }}
+                        </div>
+                        {% if workbook.metadata %}
+                            <div class="badge bg-success mb-2">
+                                ✅ Metadata Available
+                            </div>
+                        {% endif %}
+                        {% if workbook.schema %}
+                            <div class="badge bg-info mb-2">
+                                📋 Schema Detected
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if workbook.metadata and workbook.metadata.sheets %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">📋 Sheets Overview</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for sheet_name, sheet_info in workbook.metadata.sheets.items %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">📊 {{ sheet_name }}</h6>
+                            </div>
+                            <div class="card-body">
+                                {% if sheet_info.shape %}
+                                <p><strong>Dimensions:</strong> {{ sheet_info.shape.0 }} rows × {{ sheet_info.shape.1 }} columns</p>
+                                {% endif %}
+                                {% if sheet_info.columns %}
+                                <p><strong>Columns:</strong></p>
+                                <div class="small text-muted">
+                                    {% for col in sheet_info.columns|slice:":5" %}
+                                        <span class="badge bg-light text-dark me-1">{{ col }}</span>
+                                    {% endfor %}
+                                    {% if sheet_info.columns|length > 5 %}
+                                        <span class="text-muted">... and {{ sheet_info.columns|length|add:"-5" }} more</span>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">🔧 Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/api/workbooks/{{ workbook.pk }}/" class="btn btn-primary">
+                        🌐 View API Data
+                    </a>
+                    {% if workbook.metadata %}
+                    <button class="btn btn-success" onclick="downloadMetadata()">
+                        💾 Download Metadata
+                    </button>
+                    {% endif %}
+                    {% if workbook.schema %}
+                    <button class="btn btn-info" onclick="downloadSchema()">
+                        📋 Download Schema
+                    </button>
+                    {% endif %}
+                    <button class="btn btn-outline-danger" onclick="confirmDelete()">
+                        🗑️ Delete Workbook
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {% if workbook.schema and workbook.schema.columns %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">📋 Schema Summary</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Total Columns:</strong> {{ workbook.schema.columns|length }}</p>
+                <div class="small">
+                    {% for col_name, col_info in workbook.schema.columns.items|slice:":10" %}
+                        <div class="d-flex justify-content-between border-bottom py-1">
+                            <span class="text-truncate">{{ col_name }}</span>
+                            <span class="badge bg-secondary">{{ col_info.type|default:"unknown" }}</span>
+                        </div>
+                    {% endfor %}
+                    {% if workbook.schema.columns|length > 10 %}
+                        <p class="text-muted mt-2">... and {{ workbook.schema.columns|length|add:"-10" }} more columns</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function downloadMetadata() {
+    fetch('/api/workbooks/{{ workbook.pk }}/')
+        .then(response => response.json())
+        .then(data => {
+            const blob = new Blob([JSON.stringify(data.metadata, null, 2)], {type: 'application/json'});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '{{ workbook.file_name }}_metadata.json';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        });
+}
+
+function downloadSchema() {
+    fetch('/api/workbooks/{{ workbook.pk }}/')
+        .then(response => response.json())
+        .then(data => {
+            const blob = new Blob([JSON.stringify(data.schema, null, 2)], {type: 'application/json'});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '{{ workbook.file_name }}_schema.json';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        });
+}
+
+function confirmDelete() {
+    if (confirm('Are you sure you want to delete this workbook? This action cannot be undone.')) {
+        // Implementation would require a delete endpoint
+        alert('Delete functionality would be implemented here');
+    }
+}
+</script>
+{% endblock %}

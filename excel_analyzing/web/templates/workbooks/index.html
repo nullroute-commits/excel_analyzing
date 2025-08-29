@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Excel Analyzing{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="jumbotron bg-light p-5 rounded">
+            <h1 class="display-4">Welcome to Excel Analyzing</h1>
+            <p class="lead">A powerful platform for analyzing and processing Excel files with advanced data insights.</p>
+            <hr class="my-4">
+            <p>Upload your Excel files, get detailed analysis, and export results with our comprehensive data processing pipeline.</p>
+            <a class="btn btn-primary btn-lg" href="{% url 'workbooks:workbook_upload' %}" role="button">
+                📂 Upload Excel File
+            </a>
+            <a class="btn btn-outline-secondary btn-lg ms-2" href="{% url 'workbooks:workbook_list' %}" role="button">
+                📋 View Workbooks
+            </a>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">🔍 Data Analysis</h5>
+                        <p class="card-text">Comprehensive analysis of your Excel data including column types, statistics, and quality metrics.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">📊 Schema Detection</h5>
+                        <p class="card-text">Automatic detection of data schemas, column relationships, and data type inference.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">🚀 REST API</h5>
+                        <p class="card-text">Programmatic access to all features through our comprehensive REST API endpoints.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>🔗 Quick Links</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <a href="/api/" class="list-group-item list-group-item-action">
+                        🌐 REST API Documentation
+                    </a>
+                    <a href="/api/health/" class="list-group-item list-group-item-action">
+                        ❤️ Health Check
+                    </a>
+                    <a href="/api/workbooks/" class="list-group-item list-group-item-action">
+                        📋 Workbooks API
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5>💡 Features</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li>✅ Multi-sheet Excel support</li>
+                    <li>✅ Data type detection</li>
+                    <li>✅ Column normalization</li>
+                    <li>✅ Quality analysis</li>
+                    <li>✅ Schema inference</li>
+                    <li>✅ Export capabilities</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

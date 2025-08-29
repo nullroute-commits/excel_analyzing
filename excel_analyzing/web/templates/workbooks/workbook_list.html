@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Excel Analyzing{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>📋 Workbooks</h1>
+    <a href="{% url 'workbooks:workbook_upload' %}" class="btn btn-primary">
+        ➕ Upload New Workbook
+    </a>
+</div>
+
+{% if workbooks %}
+    <div class="row">
+        {% for workbook in workbooks %}
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'workbooks:workbook_detail' workbook.pk %}" class="text-decoration-none">
+                                📄 {{ workbook.file_name }}
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted">
+                            <small>
+                                📅 Created: {{ workbook.created_at|date:"M d, Y H:i" }}<br>
+                                📊 Sheets: {{ workbook.sheet_count|default:"Unknown" }}<br>
+                                💾 Size: {{ workbook.file_size|filesizeformat|default:"Unknown" }}
+                            </small>
+                        </p>
+                        {% if workbook.metadata %}
+                            <div class="badge bg-secondary mb-2">
+                                🔍 {{ workbook.metadata.sheets|length }} sheet{{ workbook.metadata.sheets|length|pluralize }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer">
+                        <div class="btn-group w-100" role="group">
+                            <a href="{% url 'workbooks:workbook_detail' workbook.pk %}" class="btn btn-outline-primary btn-sm">
+                                👁️ View
+                            </a>
+                            <a href="/api/workbooks/{{ workbook.pk }}/" class="btn btn-outline-secondary btn-sm">
+                                🔗 API
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+        <nav aria-label="Workbooks pagination" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">&laquo; First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="text-center py-5">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="text-muted">📭 No workbooks yet</h3>
+                <p class="text-muted">Upload your first Excel file to get started with data analysis.</p>
+                <a href="{% url 'workbooks:workbook_upload' %}" class="btn btn-primary btn-lg">
+                    📂 Upload Your First Workbook
+                </a>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

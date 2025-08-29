@@ -59,7 +59,9 @@ test-results/
 *.jpeg
 *.gif
 *.pdf
-*.html
+# Ignore generated HTML files (coverage reports, etc.) but not templates
+htmlcov/
+*.coverage.html
 coverage.xml
 nosetests.xml
 .tox/
