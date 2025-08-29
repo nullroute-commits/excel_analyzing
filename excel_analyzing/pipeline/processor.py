@@ -94,8 +94,11 @@ class ExcelDataProcessor:
             logger.error(f"Failed to read sheet '{sheet_name}': {e}")
             raise
 
+        # Clean sheet name for consistency
+        cleaned_sheet_name = self._clean_sheet_name(sheet_name)
+        
         # Store original dataframe
-        self._original_dataframes[f"{file_path.stem}_{sheet_name}"] = df.copy()
+        self._original_dataframes[f"{file_path.stem}_{cleaned_sheet_name}"] = df.copy()
 
         # Find header row (assume first non-empty row)
         header_row = self._find_header_row(df)
@@ -141,7 +144,7 @@ class ExcelDataProcessor:
             df_data = df_data[columns_to_keep]
 
         # Store processed dataframe
-        self._dataframes[f"{file_path.stem}_{sheet_name}"] = df_data
+        self._dataframes[f"{file_path.stem}_{cleaned_sheet_name}"] = df_data
 
         # Analyze columns
         columns_info = []
@@ -154,7 +157,7 @@ class ExcelDataProcessor:
 
         # Create sheet info
         sheet_info = SheetInfo(
-            name=self._clean_sheet_name(sheet_name),
+            name=cleaned_sheet_name,
             original_name=sheet_name,
             row_count=len(df_data),
             column_count=len(df_data.columns),
