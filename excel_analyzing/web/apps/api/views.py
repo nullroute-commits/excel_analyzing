@@ -2,11 +2,13 @@
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def api_root(request):
     """API root endpoint."""
     return Response(
@@ -19,6 +21,7 @@ def api_root(request):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([AllowAny])
 def workbook_list(request):
     """List workbooks or create new workbook."""
     if request.method == "GET":
@@ -39,6 +42,7 @@ def workbook_detail(request, pk):
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def health_check(request):
     """Health check endpoint."""
     return Response({"status": "healthy", "service": "excel-analyzing"})
